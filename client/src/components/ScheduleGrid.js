@@ -1,47 +1,55 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
+import { useTemplate } from '../context/TemplateContext';
 import './ScheduleGrid.css';
 
 function ScheduleGrid() {
-  // 요일 (월~일)
-  const [days] = useState(['월', '화', '수', '목', '금', '토', '일']);
+  const {
+    DAY_LABELS,
+    timeSlots,
+    addTimeSlot,
+    removeTimeSlot,
+    scheduleMap,
+    setCell,
+    selectedTemplateId,
+    loading
+  } = useTemplate();
 
-  // 시간대 (추가/삭제 가능)
-  const [timeSlots, setTimeSlots] = useState([
-    '2:00', '3:30', '5:00', '6:30', '8:00', '9:30'
-  ]);
-
-  // 새 시간대 추가
   const [newTime, setNewTime] = useState('');
 
-  // 시간표 데이터 (예시)
-  const [scheduleData, setScheduleData] = useState({});
+  const sortedTimeSlots = useMemo(() => timeSlots, [timeSlots]);
 
-  // 시간대 추가 함수
   const handleAddTimeSlot = () => {
-    if (newTime && !timeSlots.includes(newTime)) {
-      setTimeSlots([...timeSlots, newTime].sort());
-      setNewTime('');
+    if (!newTime.trim()) return;
+    addTimeSlot(newTime.trim());
+    setNewTime('');
+  };
+
+  const handleDeleteTimeSlot = (timeLabel) => {
+    if (window.confirm(`${timeLabel} 시간대를 삭제할까요?`)) {
+      removeTimeSlot(timeLabel);
     }
   };
 
-  // 시간대 삭제 함수
-  const handleDeleteTimeSlot = (time) => {
-    if (window.confirm(`${time} 시간대를 삭제하시겠습니까?`)) {
-      setTimeSlots(timeSlots.filter(t => t !== time));
+  const handleCellClick = (dayIndex, timeLabel) => {
+    if (!selectedTemplateId) {
+      window.alert('먼저 템플릿을 선택하거나 만들어 주세요.');
+      return;
     }
+
+    const key = `${dayIndex}-${timeLabel}`;
+    const currentValue = scheduleMap[key] || '';
+    const nextValue = window.prompt('학생 이름을 입력하세요 (쉼표로 구분 가능)', currentValue);
+    if (nextValue === null) return;
+    setCell(dayIndex, timeLabel, nextValue);
   };
 
-  // 셀 클릭 핸들러 (나중에 학생 추가 기능)
-  const handleCellClick = (day, time) => {
-    const key = `${day}-${time}`;
-    const student = prompt('학생 이름을 입력하세요:');
-    if (student) {
-      setScheduleData({
-        ...scheduleData,
-        [key]: student
-      });
-    }
-  };
+  if (!selectedTemplateId) {
+    return (
+      <div className="schedule-placeholder">
+        <p>먼저 템플릿을 만들어 주세요. (예: 정규 시간표, 시험대비 시간표)</p>
+      </div>
+    );
+  }
 
   return (
     <div className="schedule-container">
@@ -52,48 +60,48 @@ function ScheduleGrid() {
             type="text"
             placeholder="시간 (예: 10:00)"
             value={newTime}
-            onChange={(e) => setNewTime(e.target.value)}
+            onChange={(event) => setNewTime(event.target.value)}
+            disabled={loading}
           />
-          <button onClick={handleAddTimeSlot}>➕ 시간대 추가</button>
+          <button type="button" onClick={handleAddTimeSlot} disabled={loading}>
+            ➕ 시간대 추가
+          </button>
         </div>
       </div>
 
       <div className="schedule-grid">
-        {/* 헤더: 시간/요일 */}
         <div className="grid-header">
           <div className="header-cell corner">시간 / 요일</div>
-          {days.map(day => (
+          {DAY_LABELS.map((day) => (
             <div key={day} className="header-cell day-header">
               {day}요일
             </div>
           ))}
         </div>
 
-        {/* 본문: 시간대별 행 */}
-        {timeSlots.map(time => (
-          <div key={time} className="grid-row">
-            {/* 시간대 셀 */}
+        {sortedTimeSlots.map((timeLabel) => (
+          <div key={timeLabel} className="grid-row">
             <div className="time-cell">
-              <span>{time}</span>
+              <span>{timeLabel}</span>
               <button
+                type="button"
                 className="delete-time-btn"
-                onClick={() => handleDeleteTimeSlot(time)}
+                onClick={() => handleDeleteTimeSlot(timeLabel)}
                 title="시간대 삭제"
               >
                 ❌
               </button>
             </div>
 
-            {/* 요일별 셀 */}
-            {days.map(day => {
-              const key = `${day}-${time}`;
-              const student = scheduleData[key];
+            {DAY_LABELS.map((_, dayIndex) => {
+              const key = `${dayIndex}-${timeLabel}`;
+              const student = scheduleMap[key];
 
               return (
                 <div
                   key={key}
                   className={`schedule-cell ${student ? 'filled' : 'empty'}`}
-                  onClick={() => handleCellClick(day, time)}
+                  onClick={() => handleCellClick(dayIndex, timeLabel)}
                 >
                   {student || '+ 학생 추가'}
                 </div>
@@ -104,8 +112,8 @@ function ScheduleGrid() {
       </div>
 
       <div className="schedule-footer">
-        <p>💡 셀을 클릭해서 학생을 추가하세요!</p>
-        <p>💡 시간대 옆의 ❌를 클릭해서 삭제할 수 있어요!</p>
+        <p>💡 셀을 클릭해서 학생을 추가하거나 수정하세요.</p>
+        <p>💡 시간대 옆의 ❌를 클릭하면 해당 시간대를 삭제할 수 있어요.</p>
       </div>
     </div>
   );

@@ -1,0 +1,93 @@
+.template-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 20px;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.template-controls {
+  display: flex;
+  gap: 24px;
+}
+
+.template-select,
+.template-name {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 220px;
+}
+
+.template-select label,
+.template-name label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #555;
+}
+
+.template-select select,
+.template-name input {
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 2px solid #ddd;
+  font-size: 0.95rem;
+}
+
+.template-select select:disabled,
+.template-name input:disabled {
+  background-color: #f5f5f5;
+  color: #999;
+}
+
+.template-select button,
+.inline-edit button,
+.template-actions .save-button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+}
+
+.template-select button:hover,
+.inline-edit button:hover,
+.template-actions .save-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(118, 75, 162, 0.3);
+}
+
+.inline-edit {
+  display: flex;
+  gap: 10px;
+}
+
+.inline-edit input {
+  flex: 1;
+}
+
+.template-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.template-actions .save-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.error {
+  margin: 0;
+  color: #d93025;
+  font-size: 0.8rem;
+}

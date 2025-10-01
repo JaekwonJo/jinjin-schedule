@@ -5,6 +5,8 @@
 ## 🗺️ 지금 어디까지 왔나요?
 - ✅ Express 서버 + SQLite 기반 API 뼈대(`/api/templates`, `/api/change-requests`) 준비 완료
 - ✅ React 19 시간표 프로토타입을 `client/` 패키지로 분리하고 실행 스크립트 정리
+- ✅ 템플릿/시간표 상태를 중앙에서 관리하는 React 컨텍스트(`TemplateContext`) 구축
+- ✅ 로그인·권한 구조 초안 문서화 (`docs/auth/login-flow.md`)
 - ✅ CSV 원본(9월 29일 이후) 구조를 분석하고 임포트 전략 문서화
 - 🚧 React UI와 API 연결, 승인/이력 흐름은 이제 막 시작합니다.
 
@@ -79,6 +81,7 @@ jinjin-schedule/
 - [CLAUDE.md](./CLAUDE.md) — 프로젝트 비전과 세부 요구사항
 - [PROJECT_STATE.md](./PROJECT_STATE.md) — 진행 상황과 다음 할 일
 - [BUILDLOG.md](./BUILDLOG.md) — 하루하루의 기록
+- [docs/auth/login-flow.md](./docs/auth/login-flow.md) — 로그인/권한 구조 계획
 - [docs/data-import-plan.md](./docs/data-import-plan.md) — CSV 데이터 → DB 임포트 전략
 
 ## 👥 만든 사람들
