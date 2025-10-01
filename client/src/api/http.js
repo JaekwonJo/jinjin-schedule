@@ -7,9 +7,13 @@ const defaultHeaders = {
 async function request(path, options = {}) {
   const { headers = {}, body, ...rest } = options;
 
+  const token = localStorage.getItem('jinjin_token');
+  const authHeader = token ? { Authorization: `Bearer ${token}` } : {};
+
   const response = await fetch(`${API_BASE}${path}`, {
     headers: {
       ...defaultHeaders,
+      ...authHeader,
       ...headers
     },
     body: body ? JSON.stringify(body) : undefined,

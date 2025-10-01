@@ -1,0 +1,130 @@
+:root {
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --card-shadow: 0 10px 30px rgba(118, 75, 162, 0.2);
+  --input-border: #dcd8f8;
+}
+
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-gradient);
+  padding: 40px 20px;
+  box-sizing: border-box;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  padding: 36px 32px;
+  border-radius: 24px;
+  box-shadow: var(--card-shadow);
+  animation: floatIn 0.8s ease;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.login-header h1 {
+  margin: 0;
+  font-size: 2rem;
+  color: #333266;
+  letter-spacing: 1px;
+}
+
+.login-header p {
+  margin-top: 12px;
+  color: #6b6b8d;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.login-form label {
+  font-weight: 600;
+  color: #4a4a6a;
+  font-size: 0.9rem;
+}
+
+.login-form input {
+  padding: 12px 14px;
+  border: 2px solid var(--input-border);
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-form input:focus {
+  outline: none;
+  border-color: #7c6cf6;
+  box-shadow: 0 0 0 4px rgba(124, 108, 246, 0.15);
+}
+
+.login-form button {
+  margin-top: 8px;
+  padding: 12px 0;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: white;
+  background: var(--primary-gradient);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-form button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(118, 75, 162, 0.25);
+}
+
+.login-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.login-message,
+.login-error {
+  margin-top: 18px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.login-message {
+  background: #eef8ff;
+  color: #276fbf;
+}
+
+.login-error {
+  background: #ffeef0;
+  color: #d93025;
+}
+
+.login-footer {
+  text-align: center;
+  margin-top: 28px;
+  color: #8880b5;
+  font-size: 0.9rem;
+}
+
+@keyframes floatIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

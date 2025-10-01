@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTemplate } from '../context/TemplateContext';
+import { useAuth } from '../context/AuthContext';
 import './TemplateHeader.css';
 
 function TemplateHeader() {
@@ -13,6 +14,7 @@ function TemplateHeader() {
     saving,
     loading
   } = useTemplate();
+  const { user, logout } = useAuth();
 
   const [nameDraft, setNameDraft] = useState('');
   const [renameError, setRenameError] = useState('');
@@ -22,7 +24,13 @@ function TemplateHeader() {
     setNameDraft(current?.name ?? '');
   }, [templates, selectedTemplateId]);
 
+  const isManager = user?.role === 'manager' || user?.role === 'superadmin';
+
   const handleCreate = async () => {
+    if (!isManager) {
+      window.alert('템플릿을 만들 수 있는 권한이 없어요. 관리자에게 문의해 주세요.');
+      return;
+    }
     const name = window.prompt('새 템플릿 이름을 입력해 주세요.');
     if (!name) return;
     try {
@@ -35,6 +43,10 @@ function TemplateHeader() {
 
   const handleRename = async () => {
     if (!selectedTemplateId) return;
+    if (!isManager) {
+      window.alert('템플릿 이름을 수정할 수 있는 권한이 없어요.');
+      return;
+    }
     try {
       await renameTemplate(selectedTemplateId, nameDraft);
       setRenameError('');
@@ -44,6 +56,10 @@ function TemplateHeader() {
   };
 
   const handleSave = async () => {
+    if (!isManager) {
+      window.alert('시간표 저장은 관리자만 할 수 있어요.');
+      return;
+    }
     try {
       await saveSchedule();
       window.alert('시간표가 저장되었어요!');
@@ -70,7 +86,7 @@ function TemplateHeader() {
               </option>
             ))}
           </select>
-          <button type="button" onClick={handleCreate}>
+          <button type="button" onClick={handleCreate} disabled={!isManager}>
             + 새 템플릿
           </button>
         </div>
@@ -84,9 +100,9 @@ function TemplateHeader() {
               value={nameDraft}
               onChange={(event) => setNameDraft(event.target.value)}
               placeholder="예: 정규 시간표"
-              disabled={!selectedTemplateId}
+              disabled={!selectedTemplateId || !isManager}
             />
-            <button type="button" onClick={handleRename} disabled={!selectedTemplateId}>
+            <button type="button" onClick={handleRename} disabled={!selectedTemplateId || !isManager}>
               이름 수정
             </button>
           </div>
@@ -95,13 +111,22 @@ function TemplateHeader() {
       </div>
 
       <div className="template-actions">
+        {user && (
+          <div className="user-badge">
+            <span className="role-chip">{user.role === 'superadmin' ? '최고관리자' : user.role === 'manager' ? '관리선생님' : '선생님'}</span>
+            <span className="user-name">{user.displayName || user.username}</span>
+          </div>
+        )}
         <button
           type="button"
           className="save-button"
           onClick={handleSave}
-          disabled={!selectedTemplateId || saving || loading}
+          disabled={!selectedTemplateId || saving || loading || !isManager}
         >
           {saving ? '저장 중...' : '시간표 저장'}
+        </button>
+        <button type="button" className="logout-button" onClick={logout}>
+          로그아웃
         </button>
       </div>
     </div>

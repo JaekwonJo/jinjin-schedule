@@ -6,6 +6,7 @@ import {
   fetchTemplateEntries,
   saveTemplateEntries
 } from '../api/templates';
+import { useAuth } from './AuthContext';
 
 const DAY_LABELS = ['월', '화', '수', '목', '금', '토', '일'];
 const DEFAULT_TIME_SLOTS = ['2:00', '3:30', '5:00', '6:30', '8:00', '9:30'];
@@ -23,6 +24,7 @@ function buildKey(dayIndex, timeLabel) {
 }
 
 export function TemplateProvider({ children }) {
+  const { user } = useAuth();
   const [templates, setTemplates] = useState([]);
   const [selectedTemplateId, setSelectedTemplateId] = useState(null);
   const [scheduleMap, setScheduleMap] = useState({});
@@ -32,6 +34,13 @@ export function TemplateProvider({ children }) {
   const [error, setError] = useState(null);
 
   const refreshTemplates = async () => {
+    if (!user) {
+      setTemplates([]);
+      setSelectedTemplateId(null);
+      setScheduleMap({});
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {
@@ -64,10 +73,10 @@ export function TemplateProvider({ children }) {
 
   useEffect(() => {
     refreshTemplates();
-  }, []);
+  }, [user]);
 
   useEffect(() => {
-    if (!selectedTemplateId) {
+    if (!selectedTemplateId || !user) {
       setScheduleMap({});
       return;
     }

@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import './App.css';
 import ScheduleGrid from './components/ScheduleGrid';
 import TemplateHeader from './components/TemplateHeader';
+import LoginPage from './pages/LoginPage';
 import { TemplateProvider, useTemplate } from './context/TemplateContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 
 function HealthStatus() {
   const [statusText, setStatusText] = useState('연결 확인 중...');
@@ -45,7 +47,17 @@ function Dashboard() {
   );
 }
 
-function App() {
+function ProtectedApp() {
+  const { user, loading } = useAuth();
+
+  if (loading && !user) {
+    return <div className="center-loading">준비 중입니다...</div>;
+  }
+
+  if (!user) {
+    return <LoginPage />;
+  }
+
   return (
     <TemplateProvider>
       <div className="App">
@@ -59,6 +71,14 @@ function App() {
         </main>
       </div>
     </TemplateProvider>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <ProtectedApp />
+    </AuthProvider>
   );
 }
 

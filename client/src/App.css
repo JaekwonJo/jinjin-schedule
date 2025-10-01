@@ -40,6 +40,17 @@
   gap: 20px;
 }
 
+.center-loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
 .loading {
   padding: 12px 16px;
   border-radius: 8px;
