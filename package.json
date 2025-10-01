@@ -5,9 +5,10 @@
   "scripts": {
     "start": "node server/server.js",
     "server": "node server/server.js",
-    "client": "react-scripts start",
+    "client": "npm --prefix client start",
+    "client:install": "npm --prefix client install",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "build": "react-scripts build"
+    "build": "npm --prefix client run build"
   },
   "keywords": [],
   "author": "",
@@ -17,25 +18,9 @@
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "react-scripts": "^5.0.1",
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"
-  },
-  "proxy": "http://localhost:5000",
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
   }
 }

@@ -1,0 +1,92 @@
+const fs = require('fs');
+const path = require('path');
+const sqlite3 = require('sqlite3').verbose();
+
+const dataDir = path.resolve(__dirname, 'data');
+const dbPath = path.join(dataDir, 'jinjin-schedule.sqlite');
+
+// Ensure the data directory exists so SQLite can create the file.
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
+
+const db = new sqlite3.Database(dbPath);
+
+db.serialize(() => {
+  db.run('PRAGMA foreign_keys = ON');
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS templates (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      description TEXT DEFAULT '',
+      is_active INTEGER DEFAULT 0,
+      created_at TEXT DEFAULT (datetime('now')),
+      updated_at TEXT DEFAULT (datetime('now'))
+    )
+  `);
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS schedule_entries (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      template_id INTEGER NOT NULL,
+      day_of_week INTEGER NOT NULL,
+      time_label TEXT NOT NULL,
+      teacher_name TEXT DEFAULT '',
+      student_names TEXT DEFAULT '',
+      notes TEXT DEFAULT '',
+      created_at TEXT DEFAULT (datetime('now')),
+      updated_at TEXT DEFAULT (datetime('now')),
+      FOREIGN KEY (template_id) REFERENCES templates(id) ON DELETE CASCADE
+    )
+  `);
+
+  db.run(`
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_schedule_entry_unique
+    ON schedule_entries (template_id, day_of_week, time_label, teacher_name)
+  `);
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS change_requests (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      template_id INTEGER NOT NULL,
+      day_of_week INTEGER NOT NULL,
+      time_label TEXT NOT NULL,
+      requested_by TEXT NOT NULL,
+      payload TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'pending',
+      created_at TEXT DEFAULT (datetime('now')),
+      decided_at TEXT,
+      decided_by TEXT,
+      FOREIGN KEY (template_id) REFERENCES templates(id) ON DELETE CASCADE
+    )
+  `);
+});
+
+const run = (sql, params = []) => new Promise((resolve, reject) => {
+  db.run(sql, params, function onRun(err) {
+    if (err) return reject(err);
+    resolve({ id: this.lastID, changes: this.changes });
+  });
+});
+
+const get = (sql, params = []) => new Promise((resolve, reject) => {
+  db.get(sql, params, (err, row) => {
+    if (err) return reject(err);
+    resolve(row);
+  });
+});
+
+const all = (sql, params = []) => new Promise((resolve, reject) => {
+  db.all(sql, params, (err, rows) => {
+    if (err) return reject(err);
+    resolve(rows);
+  });
+});
+
+module.exports = {
+  db,
+  run,
+  get,
+  all
+};
