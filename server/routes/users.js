@@ -99,21 +99,51 @@ router.patch('/:id/password', async (req, res) => {
 
 router.patch('/:id/status', async (req, res) => {
   const { id } = req.params;
-  const { isActive } = req.body;
+  const { isActive, role } = req.body;
 
-  if (typeof isActive !== 'boolean') {
-    return res.status(400).json({ error: 'isActive 값이 필요해요.' });
+  if (typeof isActive !== 'boolean' && !role) {
+    return res.status(400).json({ error: 'isActive 또는 role 중 하나는 반드시 포함되어야 해요.' });
+  }
+
+  if (role && !ALLOWED_ROLES.includes(role)) {
+    return res.status(400).json({ error: '올바르지 않은 역할입니다.' });
   }
 
   try {
-    const user = await get('SELECT id FROM users WHERE id = ?', [id]);
+    const user = await get('SELECT id, role FROM users WHERE id = ?', [id]);
     if (!user) {
       return res.status(404).json({ error: '계정을 찾지 못했어요.' });
     }
 
+    if (user.role === 'superadmin' && (role && role !== 'superadmin')) {
+      return res.status(400).json({ error: '최고 관리자의 역할은 변경할 수 없어요.' });
+    }
+
+    const fields = [];
+    const params = [];
+
+    if (typeof isActive === 'boolean') {
+      fields.push('is_active = ?');
+      params.push(isActive ? 1 : 0);
+    }
+
+    if (role) {
+      fields.push('role = ?');
+      params.push(role);
+    }
+
     const now = new Date().toISOString();
-    await run('UPDATE users SET is_active = ?, updated_at = ? WHERE id = ?', [isActive ? 1 : 0, now, id]);
-    res.json({ success: true });
+    fields.push('updated_at = ?');
+    params.push(now, id);
+
+    await run(`UPDATE users SET ${fields.join(', ')} WHERE id = ?`, params);
+
+    const updated = await get(
+      'SELECT id, username, display_name, role, is_active, created_at, updated_at FROM users WHERE id = ?',
+      [id]
+    );
+
+    res.json({ user: mapUser(updated) });
   } catch (error) {
     console.error('계정 상태 변경 실패', error);
     res.status(500).json({ error: '계정 상태를 변경하지 못했어요.' });

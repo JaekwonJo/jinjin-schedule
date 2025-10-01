@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTemplate } from '../context/TemplateContext';
 import { useAuth } from '../context/AuthContext';
+import UserManagementPanel from './UserManagementPanel';
 import './TemplateHeader.css';
 
 function TemplateHeader() {
@@ -18,6 +19,7 @@ function TemplateHeader() {
 
   const [nameDraft, setNameDraft] = useState('');
   const [renameError, setRenameError] = useState('');
+  const [showUserPanel, setShowUserPanel] = useState(false);
 
   useEffect(() => {
     const current = templates.find((template) => template.id === selectedTemplateId);
@@ -25,6 +27,7 @@ function TemplateHeader() {
   }, [templates, selectedTemplateId]);
 
   const isManager = user?.role === 'manager' || user?.role === 'superadmin';
+  const isSuperadmin = user?.role === 'superadmin';
 
   const handleCreate = async () => {
     if (!isManager) {
@@ -113,8 +116,17 @@ function TemplateHeader() {
       <div className="template-actions">
         {user && (
           <div className="user-badge">
-            <span className="role-chip">{user.role === 'superadmin' ? '최고관리자' : user.role === 'manager' ? '관리선생님' : '선생님'}</span>
+            <span className="role-chip">{user.role === 'superadmin' ? '최고 관리자' : user.role === 'manager' ? '관리 선생님' : '선생님'}</span>
             <span className="user-name">{user.displayName || user.username}</span>
+            {isSuperadmin && (
+              <button
+                type="button"
+                className="user-panel-toggle"
+                onClick={() => setShowUserPanel((prev) => !prev)}
+              >
+                {showUserPanel ? '계정 관리 닫기' : '계정 관리 열기'}
+              </button>
+            )}
           </div>
         )}
         <button
@@ -129,6 +141,7 @@ function TemplateHeader() {
           로그아웃
         </button>
       </div>
+      {showUserPanel && isSuperadmin && <UserManagementPanel />}
     </div>
   );
 }

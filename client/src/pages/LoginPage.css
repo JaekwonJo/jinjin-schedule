@@ -118,6 +118,20 @@
   font-size: 0.9rem;
 }
 
+.link-button {
+  margin-top: 12px;
+  background: none;
+  border: none;
+  color: #5a52b8;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.link-button:hover {
+  color: #3f36aa;
+}
+
 @keyframes floatIn {
   from {
     transform: translateY(20px);

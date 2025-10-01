@@ -14,3 +14,10 @@ export async function fetchCurrentUser(token) {
     }
   });
 }
+
+export async function signupRequest(form) {
+  return request('/api/auth/signup', {
+    method: 'POST',
+    body: form
+  });
+}

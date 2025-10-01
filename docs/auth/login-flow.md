@@ -15,6 +15,10 @@
 ## 2. 인증·계정 관리 흐름
 
 ```
+[가입 폼]
+  └─ (아이디/비밀번호/이름 입력) → POST /api/auth/signup
+      └─ 서버에서 중복/길이 검증 후 role=teacher, is_active=0으로 저장
+
 [로그인 폼]
   └─ (아이디/비밀번호 입력) → POST /api/auth/login
       └─ 서버에서 비밀번호 비교(bcrypt) & 계정 상태 확인
@@ -22,10 +26,10 @@
           └─ 실패: 오류 메시지 (잘못된 정보, 계정 비활성 등)
 ```
 
-1. 최고 관리자는 “계정 관리” 화면에서 아이디/비밀번호/역할을 지정해 새 계정을 만듭니다.
-2. 관리자는 발급된 계정을 각 선생님께 전달합니다. (예: `hyunT / 초기비밀번호`)
-3. 선생님은 로그인 후 시간표를 확인하고 필요한 수정 요청을 남깁니다.
-4. 관리 선생님은 동일한 로그인 화면에서 들어와 요청을 승인/거절합니다.
+1. 선생님이 직접 가입 요청을 보냅니다. (기본 역할 `teacher`, `is_active=false`)
+2. superadmin이 “계정 관리” 화면에서 승인/거절 + 역할 지정(선생님/관리) 처리
+3. 승인된 계정은 바로 로그인 가능, 반려되면 비활성 상태 유지
+4. 관리 선생님은 승인/거절 권한은 없지만 계정 상태를 확인할 수 있음(추후 설정 가능)
 5. 토큰 만료(24시간) 또는 로그아웃 시 다시 로그인해야 합니다.
 
 추후 패치 계획: 사용자 본인이 비밀번호를 변경할 수 있는 페이지 제공.
@@ -48,22 +52,22 @@
 ## 4. 구현 체크리스트
 
 ### 백엔드
-- [ ] `users` 테이블 생성 (id, username, display_name, role, password_hash, is_active, created_at, updated_at)
-- [ ] 시드 스크립트: 존재하지 않으면 `.env` 기반 superadmin 자동 생성
-- [ ] POST `/api/auth/login` (JWT 발급, 유효기간 24시간, refresh 없이 단순 만료)
-- [ ] JWT 검증 미들웨어 + 역할 검사 미들웨어
-- [ ] superadmin 전용 API
-  - [ ] POST `/api/users` (새 계정 생성)
-  - [ ] PATCH `/api/users/:id/password` (비밀번호 초기화)
-  - [ ] GET `/api/users` (계정 목록)
-  - [ ] PATCH `/api/users/:id/status` (활성/비활성)
+- [x] `users` 테이블 생성 (id, username, display_name, role, password_hash, is_active, created_at, updated_at)
+- [x] 시드 스크립트: 존재하지 않으면 `.env` 기반 superadmin 자동 생성
+- [x] POST `/api/auth/login` (JWT 발급, 유효기간 24시간, refresh 없이 단순 만료)
+- [x] JWT 검증 미들웨어 + 역할 검사 미들웨어
+- [x] superadmin 전용 API
+  - [x] POST `/api/users` (새 계정 생성)
+  - [x] PATCH `/api/users/:id/password` (비밀번호 초기화)
+  - [x] GET `/api/users` (계정 목록)
+  - [x] PATCH `/api/users/:id/status` (활성/비활성)
 
 ### 프론트엔드
-- [ ] 로그인 페이지 (`LoginPage`): 아이디 + 비밀번호 입력 폼
-- [ ] 인증 컨텍스트 (`AuthProvider`) — 토큰, 사용자 정보, 자동 로그아웃 처리
+- [x] 로그인 페이지 (`LoginPage`): 아이디 + 비밀번호 입력 폼
+- [x] 인증 컨텍스트 (`AuthProvider`) — 토큰, 사용자 정보, 자동 로그아웃 처리
 - [ ] 보호 라우트 컴포넌트 (`RequireRole`)
 - [ ] superadmin용 계정 관리 UI (간단한 테이블 + 생성/초기화 모달)
-- [ ] 로그인 실패/세션 만료 UX (친절한 안내)
+- [x] 로그인 실패/세션 만료 UX (친절한 안내)
 
 ## 5. 추후 확장 아이디어
 - 비밀번호 변경/분실 기능 (이메일 또는 관리자 승인)

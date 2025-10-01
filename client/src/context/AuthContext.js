@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react';
-import { loginRequest, fetchCurrentUser } from '../api/auth';
+import { loginRequest, fetchCurrentUser, signupRequest } from '../api/auth';
 
 const AuthContext = createContext(null);
 
@@ -57,6 +57,11 @@ export function AuthProvider({ children }) {
     return userInfo;
   }, []);
 
+  const signup = useCallback(async (form) => {
+    setError(null);
+    return signupRequest(form);
+  }, []);
+
   const logout = useCallback(() => {
     saveToken(null);
     setToken(null);
@@ -69,9 +74,10 @@ export function AuthProvider({ children }) {
     loading,
     error,
     login,
+    signup,
     logout,
     setError
-  }), [token, user, loading, error, login, logout]);
+  }), [token, user, loading, error, login, signup, logout]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
