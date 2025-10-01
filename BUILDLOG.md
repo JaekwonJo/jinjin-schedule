@@ -145,3 +145,11 @@
 **기분**: 드디어 로그인부터 시간표까지 한 줄! 😎
 
 ---
+
+## 2025-10-02 (Evening) - UX 마감 점검 🌙
+
+- 오류: 셀 편집 시 학생 색상을 저장하지 못함 → 원인: DB/Context 구조에 색상 필드 부재 → 해결: `schedule_entries.color` 컬럼 추가 후 Context/모달에 동기화 → 수정파일: `server/db.js`, `server/routes/templates.js`, `client/src/context/TemplateContext.js`, `client/src/components/ScheduleGrid.js`, `client/src/components/modals/EditCellModal.js`
+- 오류: 인쇄본에 학원 브랜드와 일요일 강조가 빠짐 → 원인: 기존 미리보기 템플릿 부족 → 해결: 로고 이미지 추가하고 일요일 컬럼 스타일링 → 수정파일: `client/public/logo-jinjin.png`, `client/src/components/modals/PrintPreviewModal.js`, `client/src/components/modals/PrintPreviewModal.css`
+- 오류: 승인/거절 알림이 선생님에게 누적되지 않음 → 원인: 읽음 처리 API 부재 → 해결: `PATCH /acknowledge` 추가 후 토스트에서 호출 → 수정파일: `server/routes/changeRequests.js`, `client/src/api/changeRequests.js`, `client/src/components/ChangeNotifications.js`
+- 오류: 선생님이 과거 요청을 조회할 방법 없음 → 원인: UI 미구현 → 해결: 요청 히스토리 패널 구현 및 TemplateHeader에 연결 → 수정파일: `client/src/components/ChangeHistoryPanel.js`, `client/src/components/TemplateHeader.js`
+- 작업 메모: 문서(README/PROJECT_STATE/BUILDLOG)에 SMTP 설정과 오늘 변경 사항을 동기화하여 기록
