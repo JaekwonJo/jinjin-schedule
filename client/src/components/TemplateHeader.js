@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useTemplate } from '../context/TemplateContext';
 import { useAuth } from '../context/AuthContext';
+import { fetchChangeRequests } from '../api/changeRequests';
 import UserManagementPanel from './UserManagementPanel';
+import ChangeRequestPanel from './ChangeRequestPanel';
 import './TemplateHeader.css';
 
 function TemplateHeader() {
@@ -13,13 +15,17 @@ function TemplateHeader() {
     renameTemplate,
     saveSchedule,
     saving,
-    loading
+    loading,
+    refreshTemplates
   } = useTemplate();
   const { user, logout } = useAuth();
 
   const [nameDraft, setNameDraft] = useState('');
   const [renameError, setRenameError] = useState('');
   const [showUserPanel, setShowUserPanel] = useState(false);
+  const [showRequestPanel, setShowRequestPanel] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
+  const [requestLoading, setRequestLoading] = useState(false);
 
   useEffect(() => {
     const current = templates.find((template) => template.id === selectedTemplateId);
@@ -28,6 +34,26 @@ function TemplateHeader() {
 
   const isManager = user?.role === 'manager' || user?.role === 'superadmin';
   const isSuperadmin = user?.role === 'superadmin';
+
+  useEffect(() => {
+    const loadPendingCount = async () => {
+      if (!isManager) {
+        setPendingCount(0);
+        return;
+      }
+      setRequestLoading(true);
+      try {
+        const data = await fetchChangeRequests('pending');
+        setPendingCount((data.requests || []).length);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setRequestLoading(false);
+      }
+    };
+
+    loadPendingCount();
+  }, [isManager, showRequestPanel]);
 
   const handleCreate = async () => {
     if (!isManager) {
@@ -118,6 +144,19 @@ function TemplateHeader() {
           <div className="user-badge">
             <span className="role-chip">{user.role === 'superadmin' ? '최고 관리자' : user.role === 'manager' ? '관리 선생님' : '선생님'}</span>
             <span className="user-name">{user.displayName || user.username}</span>
+            {isManager && (
+              <button
+                type="button"
+                className="user-panel-toggle"
+                onClick={() => setShowRequestPanel((prev) => !prev)}
+              >
+                {showRequestPanel ? '요청 관리 닫기' : '요청 관리 열기'}
+                {pendingCount > 0 && !showRequestPanel && (
+                  <span className="badge">{pendingCount}</span>
+                )}
+                {requestLoading && !showRequestPanel && <span className="badge badge--loading">…</span>}
+              </button>
+            )}
             {isSuperadmin && (
               <button
                 type="button"
@@ -141,6 +180,12 @@ function TemplateHeader() {
           로그아웃
         </button>
       </div>
+      {showRequestPanel && isManager && (
+        <ChangeRequestPanel
+          onRefreshTemplates={refreshTemplates}
+          onPendingUpdate={setPendingCount}
+        />
+      )}
       {showUserPanel && isSuperadmin && <UserManagementPanel />}
     </div>
   );

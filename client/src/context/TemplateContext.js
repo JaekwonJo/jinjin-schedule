@@ -93,7 +93,10 @@ export function TemplateProvider({ children }) {
 
         entries.forEach((entry) => {
           const key = buildKey(entry.dayOfWeek, entry.timeLabel);
-          newMap[key] = entry.studentNames || '';
+          newMap[key] = {
+            students: entry.studentNames || '',
+            notes: entry.notes || ''
+          };
           slots.add(entry.timeLabel);
         });
 
@@ -113,10 +116,16 @@ export function TemplateProvider({ children }) {
 
   const setCell = (dayIndex, timeLabel, value) => {
     const key = buildKey(dayIndex, timeLabel);
-    setScheduleMap((prev) => ({
-      ...prev,
-      [key]: value
-    }));
+    setScheduleMap((prev) => {
+      const next = { ...prev };
+      const hasContent = value && (value.students?.trim?.() || value.notes?.trim?.());
+      if (hasContent) {
+        next[key] = value;
+      } else {
+        delete next[key];
+      }
+      return next;
+    });
   };
 
   const addTimeSlot = (label) => {
@@ -149,14 +158,17 @@ export function TemplateProvider({ children }) {
       timeSlots.forEach((timeLabel) => {
         DAY_LABELS.forEach((_, dayIndex) => {
           const key = buildKey(dayIndex, timeLabel);
-          const studentNames = scheduleMap[key];
-          if (studentNames && studentNames.trim()) {
+          const cell = scheduleMap[key];
+          const students = cell?.students?.trim?.() || '';
+          const notes = cell?.notes?.trim?.() || '';
+
+          if (students || notes) {
             entries.push({
               dayOfWeek: dayIndex,
               timeLabel,
               teacherName: '',
-              studentNames: studentNames.trim(),
-              notes: ''
+              studentNames: students,
+              notes
             });
           }
         });

@@ -117,12 +117,13 @@
   border: 2px dashed #ddd;
   border-radius: 5px;
   cursor: pointer;
-  text-align: center;
   transition: all 0.2s;
-  min-height: 80px;
+  min-height: 90px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 8px;
 }
 
 .schedule-cell.empty {
@@ -135,6 +136,19 @@
   border: 2px solid #5ec0cc;
   color: #333;
   font-weight: 600;
+}
+
+.cell-students {
+  text-align: center;
+  white-space: pre-wrap;
+}
+
+.cell-notes {
+  font-size: 0.8rem;
+  color: #2f3b47;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 4px 8px;
+  border-radius: 999px;
 }
 
 .schedule-cell:hover {
