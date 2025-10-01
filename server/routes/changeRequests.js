@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const { run, all, get } = require('../db');
+const { requireRole } = require('../middleware/auth');
 
 const mapRow = (row) => ({
   id: row.id,
@@ -63,7 +64,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.patch('/:id/decision', async (req, res) => {
+router.patch('/:id/decision', requireRole('manager', 'superadmin'), async (req, res) => {
   const { id } = req.params;
   const { status, decidedBy } = req.body;
 

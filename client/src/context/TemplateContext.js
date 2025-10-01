@@ -8,6 +8,7 @@ import {
 } from '../api/templates';
 
 const DAY_LABELS = ['월', '화', '수', '목', '금', '토', '일'];
+const DEFAULT_TIME_SLOTS = ['2:00', '3:30', '5:00', '6:30', '8:00', '9:30'];
 
 const TemplateContext = createContext(null);
 
@@ -25,7 +26,7 @@ export function TemplateProvider({ children }) {
   const [templates, setTemplates] = useState([]);
   const [selectedTemplateId, setSelectedTemplateId] = useState(null);
   const [scheduleMap, setScheduleMap] = useState({});
-  const [timeSlots, setTimeSlots] = useState(['2:00', '3:30', '5:00', '6:30', '8:00', '9:30']);
+  const [timeSlots, setTimeSlots] = useState([...DEFAULT_TIME_SLOTS]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
@@ -79,7 +80,7 @@ export function TemplateProvider({ children }) {
         const entries = data.entries ?? [];
 
         const newMap = {};
-        const slots = new Set(timeSlots);
+        const slots = new Set(DEFAULT_TIME_SLOTS);
 
         entries.forEach((entry) => {
           const key = buildKey(entry.dayOfWeek, entry.timeLabel);
@@ -99,7 +100,6 @@ export function TemplateProvider({ children }) {
     };
 
     loadEntries();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedTemplateId]);
 
   const setCell = (dayIndex, timeLabel, value) => {

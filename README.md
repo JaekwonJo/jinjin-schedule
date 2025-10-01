@@ -26,6 +26,18 @@
 - **Database**: SQLite (파일 위치 `server/data/jinjin-schedule.sqlite`)
 - **이메일(예정)**: Nodemailer
 
+## 🔐 환경 변수 (.env 예시)
+프로젝트 루트에 `.env` 파일을 만들고 아래 값을 원하는 값으로 채워 주세요. (없으면 개발용 기본값이 사용되지만, 실제 배포 전에 꼭 바꿔 주세요!)
+
+```
+JWT_SECRET=dev-secret-change-me
+SUPERADMIN_USERNAME=admin
+SUPERADMIN_PASSWORD=admin1234
+SUPERADMIN_DISPLAY_NAME=원장님
+PASSWORD_SALT_ROUNDS=10
+PORT=5000
+```
+
 ## 🚀 실행 방법
 ```bash
 # 1) 루트 의존성 설치
@@ -46,17 +58,22 @@ npm run build
 ```
 > Tip: `npm run server`가 처음 실패한다면 `npm rebuild sqlite3 --build-from-source`로 네이티브 모듈을 한 번 빌드해 주세요. (WSL/리눅스 환경에서 필요한 작업이에요.)
 
-## 📡 API 초안
-- `GET /api/health` — 서버 상태 확인
-- `GET /api/templates` — 템플릿 목록 + 수업 개수
-- `POST /api/templates` — 새 템플릿 생성
-- `PUT /api/templates/:id` — 템플릿 정보 수정
-- `DELETE /api/templates/:id` — 템플릿 삭제
+## 📡 API 초안 (권한 필요)
+- `POST /api/auth/login` — 아이디/비밀번호 로그인 → JWT 발급 (24시간 유지)
+- `GET /api/me` — 현재 로그인한 사용자 정보 확인
+- `GET /api/templates` — 템플릿 목록 + 수업 개수 (로그인 필요)
+- `POST /api/templates` — 새 템플릿 생성 (manager 이상)
+- `PUT /api/templates/:id` — 템플릿 정보 수정 (manager 이상)
+- `DELETE /api/templates/:id` — 템플릿 삭제 (manager 이상)
 - `GET /api/templates/:id/entries` — 템플릿에 연결된 시간표 조회
-- `PUT /api/templates/:id/entries` — 시간표 전체 저장(덮어쓰기)
-- `GET /api/change-requests?status=pending` — 수정 요청 목록
-- `POST /api/change-requests` — 수정 요청 작성
-- `PATCH /api/change-requests/:id/decision` — 승인/거절 처리
+- `PUT /api/templates/:id/entries` — 시간표 전체 저장(덮어쓰기) (manager 이상)
+- `GET /api/change-requests?status=pending` — 수정 요청 목록 (로그인 필요, 추후 역할별 필터 예정)
+- `POST /api/change-requests` — 수정 요청 작성 (선생님)
+- `PATCH /api/change-requests/:id/decision` — 승인/거절 처리 (manager 이상)
+- `GET /api/users` — 계정 목록 조회 (superadmin 전용)
+- `POST /api/users` — 새 선생님/관리자 계정 생성 (superadmin 전용)
+- `PATCH /api/users/:id/password` — 비밀번호 초기화 (superadmin 전용)
+- `PATCH /api/users/:id/status` — 계정 활성/비활성 (superadmin 전용)
 
 ## 📂 프로젝트 구조
 ```
@@ -68,6 +85,7 @@ jinjin-schedule/
 ├── server/                # Express + SQLite API
 │   ├── data/              # SQLite DB 파일 (자동 생성)
 │   ├── db.js              # DB 커넥션 & 스키마 초기화
+│   ├── middleware/        # 인증 등 공용 미들웨어
 │   ├── routes/            # API 라우터
 │   └── server.js
 ├── docs/                  # 문서 (임포트 계획 등)

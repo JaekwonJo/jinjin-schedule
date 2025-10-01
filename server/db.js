@@ -1,6 +1,14 @@
 const fs = require('fs');
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
+const bcrypt = require('bcryptjs');
+
+const {
+  PASSWORD_SALT_ROUNDS,
+  SUPERADMIN_USERNAME,
+  SUPERADMIN_PASSWORD,
+  SUPERADMIN_DISPLAY_NAME
+} = require('./config');
 
 const dataDir = path.resolve(__dirname, 'data');
 const dbPath = path.join(dataDir, 'jinjin-schedule.sqlite');
@@ -61,7 +69,40 @@ db.serialize(() => {
       FOREIGN KEY (template_id) REFERENCES templates(id) ON DELETE CASCADE
     )
   `);
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT NOT NULL UNIQUE,
+      display_name TEXT DEFAULT '',
+      role TEXT NOT NULL CHECK (role IN ('teacher', 'manager', 'superadmin')),
+      password_hash TEXT NOT NULL,
+      is_active INTEGER NOT NULL DEFAULT 1,
+      created_at TEXT DEFAULT (datetime('now')),
+      updated_at TEXT DEFAULT (datetime('now'))
+    )
+  `);
+
+  seedSuperAdmin();
 });
+
+function seedSuperAdmin() {
+  const hashed = bcrypt.hashSync(SUPERADMIN_PASSWORD, PASSWORD_SALT_ROUNDS);
+
+  db.run(
+    `INSERT INTO users (username, display_name, role, password_hash)
+     SELECT ?, ?, 'superadmin', ?
+     WHERE NOT EXISTS (
+       SELECT 1 FROM users WHERE username = ?
+     )`,
+    [SUPERADMIN_USERNAME, SUPERADMIN_DISPLAY_NAME, hashed, SUPERADMIN_USERNAME],
+    (err) => {
+      if (err) {
+        console.error('슈퍼 관리자 생성에 실패했어요.', err);
+      }
+    }
+  );
+}
 
 const run = (sql, params = []) => new Promise((resolve, reject) => {
   db.run(sql, params, function onRun(err) {

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const { run, all, get } = require('../db');
+const { requireRole } = require('../middleware/auth');
 
 const mapTemplateRow = (row) => ({
   id: row.id,
@@ -46,7 +47,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', requireRole('manager', 'superadmin'), async (req, res) => {
   const { name, description = '', isActive = false } = req.body;
 
   if (!name) {
@@ -86,7 +87,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireRole('manager', 'superadmin'), async (req, res) => {
   const { id } = req.params;
   const { name, description, isActive } = req.body;
 
@@ -115,7 +116,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireRole('manager', 'superadmin'), async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -156,7 +157,7 @@ router.get('/:id/entries', async (req, res) => {
   }
 });
 
-router.put('/:id/entries', async (req, res) => {
+router.put('/:id/entries', requireRole('manager', 'superadmin'), async (req, res) => {
   const { id } = req.params;
   const { entries } = req.body;
 

@@ -2,11 +2,14 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
-// Initialize database and ensure tables are ready.
+// Initialize environment/config and database.
 require('./db');
 
 const templateRoutes = require('./routes/templates');
 const changeRequestRoutes = require('./routes/changeRequests');
+const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/users');
+const { authenticate } = require('./middleware/auth');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -17,8 +20,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // 라우트
-app.use('/api/templates', templateRoutes);
-app.use('/api/change-requests', changeRequestRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/templates', authenticate, templateRoutes);
+app.use('/api/change-requests', authenticate, changeRequestRoutes);
+app.use('/api/users', userRoutes);
+
+app.get('/api/me', authenticate, (req, res) => {
+  res.json({ user: req.user });
+});
 
 app.get('/api/health', (req, res) => {
   res.json({
