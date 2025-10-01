@@ -4,65 +4,53 @@
 
 ### 🎯 오늘의 목표
 - [x] 프로젝트 초기 세팅
-- [x] 문서 작성
-- [ ] 기본 서버 구성
-- [ ] 기본 React 앱 세팅
+- [x] 문서 작성 & 정리
+- [x] 기본 서버 구성
+- [x] 기본 React 앱 세팅
 
 ### ✅ 완료한 작업
 
-#### 1. 프로젝트 생성
-- Desktop에 `jinjin-schedule` 폴더 생성
-- npm 초기화 완료
-- 패키지 설치:
-  - React 19, React DOM, React Scripts
-  - Express 5, CORS, Body-parser
-  - SQLite3
-  - Concurrently (dev)
+#### 1. 프로젝트 생성 & 환경 세팅
+- Desktop에 `jinjin-schedule` 폴더 생성, npm 초기화
+- 핵심 패키지 설치 (React 19, Express 5, SQLite 등)
+- `npm run dev`용 concurrently 스크립트 초안 추가
 
-#### 2. 폴더 구조 생성
-```
-jinjin-schedule/
-├── client/
-│   ├── src/
-│   │   ├── components/
-│   │   └── pages/
-│   └── public/
-├── server/
-│   ├── routes/
-│   └── models/
-└── docs/
-```
+#### 2. 서버 베이스 구축
+- `server/server.js` 작성, Express 앱 구성
+- `/api/health` 헬스체크로 서버 상태 확인 가능
+- CORS/Body-parser 기본 설정 완료
 
-#### 3. 문서 작성
-- ✅ CLAUDE.md - AI 팀원용 상세 기획서
-- ✅ README.md - 프로젝트 소개
-- ✅ PROJECT_STATE.md - 진행 상황 추적
-- ✅ BUILDLOG.md - 이 파일!
+#### 3. 프론트엔드 베이스 구축
+- `client/` 폴더 구조 마련 (`src`, `public`)
+- `App` 컴포넌트에서 서버 헬스체크 결과 표시
+- `ScheduleGrid` 컴포넌트로 시간표 격자/시간대 추가·삭제 프로토타입 구현
+
+#### 4. 문서 정리
+- README / PROJECT_STATE / BUILDLOG / CLAUDE 초안 작성
+- 진행 상태, 우선순위, 다음 단계 재정리
 
 ### 💡 배운 점
-- npm은 한글 폴더명을 지원하지 않음 (영어로 변경 필요)
-- League of English 경험 덕분에 세팅이 빠름!
+- 루트에서 React를 실행하려면 폴더 구조를 더 다듬어야 함 → 다음 작업으로 이관
+- 선생님 요구사항(심플·빠름·핵심 기능) 반복 확인이 중요
 
 ### 🤔 어려웠던 점
-- 없음 (순조로움!)
+- 아직 없음 (시작 단계, 순조롭게 진행 중!)
 
 ### 📝 메모
-- 원장님의 핵심 요구사항: **"심플하게, 빠르게, 필수 기능만!"**
-- 목표: 며칠 안에 완성
-- 1순위: 시간표 UI
-- 2순위: 변경 이력
+- 1순위: **시간표 UI 완성**
+- 2순위: **변경 이력 & 승인 흐름**
+- 스크립트 동작 확인 및 DB 설계는 바로 다음 스텝
 
 ### 다음 단계
-1. package.json 스크립트 설정 (npm run dev 등)
-2. 기본 서버 파일 (server.js) 생성
-3. 기본 React 앱 구조 만들기
-4. 시간표 격자 UI 컴포넌트 제작 시작
+1. 루트 npm 스크립트 손봐서 프론트/백 동시에 실행되게 만들기
+2. 시간표·템플릿·요청용 DB 스키마 정리
+3. ScheduleGrid를 실제 데이터와 연결할 구조 설계
 
 ---
 
-**작업 시간**: 약 1시간
+**작업 시간**: 약 2시간
 **기분**: 신남! 빠르게 진행 중! 🔥
 
 ---
 
-*다음 날 작업 시 여기에 계속 추가!*
+*다음 날 작업 시 여기에 계속 추가할게요!*
