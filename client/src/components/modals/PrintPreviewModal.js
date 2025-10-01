@@ -13,10 +13,11 @@ function PrintPreviewModal({
   const getCellContent = (dayIndex, timeLabel) => {
     const key = `${dayIndex}-${timeLabel}`;
     const cell = scheduleMap[key];
-    if (!cell) return { students: '', notes: '' };
+    if (!cell) return { students: '', notes: '', color: '#333333' };
     return {
       students: cell.students || '',
-      notes: cell.notes || ''
+      notes: cell.notes || '',
+      color: cell.color || '#333333'
     };
   };
 
@@ -29,6 +30,7 @@ function PrintPreviewModal({
             템플릿: <strong>{templateName}</strong><br />
             생성 시각: {now}
           </p>
+          <img src="/logo-jinjin.png" alt="진진영어 학원 로고" className="print-logo" />
         </header>
 
         <div className="print-table-wrapper">
@@ -46,11 +48,11 @@ function PrintPreviewModal({
                 <tr key={timeLabel}>
                   <td className="time-cell">{timeLabel}</td>
                   {dayLabels.map((_, dayIndex) => {
-                    const { students, notes } = getCellContent(dayIndex, timeLabel);
+                    const { students, notes, color } = getCellContent(dayIndex, timeLabel);
                     return (
                       <td key={`${dayIndex}-${timeLabel}`}>
                         {students && (
-                          <div className="students">{students}</div>
+                          <div className="students" style={{ color }}>{students}</div>
                         )}
                         {notes && (
                           <div className="notes">📝 {notes}</div>

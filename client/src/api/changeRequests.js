@@ -21,3 +21,9 @@ export async function createChangeRequest(payload) {
     body: payload
   });
 }
+
+export async function acknowledgeChangeRequest(id) {
+  return request(`/api/change-requests/${id}/acknowledge`, {
+    method: 'PATCH'
+  });
+}

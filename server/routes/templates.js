@@ -21,6 +21,7 @@ const mapEntryRow = (row) => ({
   teacherName: row.teacher_name,
   studentNames: row.student_names,
   notes: row.notes,
+  color: row.color || '#333333',
   createdAt: row.created_at,
   updatedAt: row.updated_at
 });
@@ -185,7 +186,8 @@ router.put('/:id/entries', requireRole('manager', 'superadmin'), async (req, res
           timeLabel,
           teacherName = '',
           studentNames = '',
-          notes = ''
+          notes = '',
+          color = '#333333'
         } = entry;
 
         if (typeof dayOfWeek !== 'number' || !timeLabel) {
@@ -193,9 +195,9 @@ router.put('/:id/entries', requireRole('manager', 'superadmin'), async (req, res
         }
 
         await run(
-          `INSERT INTO schedule_entries (template_id, day_of_week, time_label, teacher_name, student_names, notes, created_at, updated_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-          [id, dayOfWeek, timeLabel, teacherName, studentNames, notes, now, now]
+          `INSERT INTO schedule_entries (template_id, day_of_week, time_label, teacher_name, student_names, notes, color, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [id, dayOfWeek, timeLabel, teacherName, studentNames, notes, color, now, now]
         );
       }
 

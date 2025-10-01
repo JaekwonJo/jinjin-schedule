@@ -10,6 +10,7 @@ import { useAuth } from './AuthContext';
 
 const DAY_LABELS = ['월', '화', '수', '목', '금', '토', '일'];
 const DEFAULT_TIME_SLOTS = ['2:00', '3:30', '5:00', '6:30', '8:00', '9:30'];
+const DEFAULT_COLOR = '#333333';
 
 const TemplateContext = createContext(null);
 
@@ -95,7 +96,8 @@ export function TemplateProvider({ children }) {
           const key = buildKey(entry.dayOfWeek, entry.timeLabel);
           newMap[key] = {
             students: entry.studentNames || '',
-            notes: entry.notes || ''
+            notes: entry.notes || '',
+            color: entry.color || DEFAULT_COLOR
           };
           slots.add(entry.timeLabel);
         });
@@ -161,6 +163,7 @@ export function TemplateProvider({ children }) {
           const cell = scheduleMap[key];
           const students = cell?.students?.trim?.() || '';
           const notes = cell?.notes?.trim?.() || '';
+          const color = cell?.color || DEFAULT_COLOR;
 
           if (students || notes) {
             entries.push({
@@ -168,7 +171,8 @@ export function TemplateProvider({ children }) {
               timeLabel,
               teacherName: '',
               studentNames: students,
-              notes
+              notes,
+              color
             });
           }
         });

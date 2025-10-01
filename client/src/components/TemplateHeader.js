@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { fetchChangeRequests } from '../api/changeRequests';
 import UserManagementPanel from './UserManagementPanel';
 import ChangeRequestPanel from './ChangeRequestPanel';
+import ChangeHistoryPanel from './ChangeHistoryPanel';
 import PrintPreviewModal from './modals/PrintPreviewModal';
 import './TemplateHeader.css';
 
@@ -28,6 +29,7 @@ function TemplateHeader() {
   const [renameError, setRenameError] = useState('');
   const [showUserPanel, setShowUserPanel] = useState(false);
   const [showRequestPanel, setShowRequestPanel] = useState(false);
+  const [showHistoryPanel, setShowHistoryPanel] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
   const [requestLoading, setRequestLoading] = useState(false);
   const [showPrintPreview, setShowPrintPreview] = useState(false);
@@ -149,6 +151,13 @@ function TemplateHeader() {
           <div className="user-badge">
             <span className="role-chip">{user.role === 'superadmin' ? '최고 관리자' : user.role === 'manager' ? '관리 선생님' : '선생님'}</span>
             <span className="user-name">{user.displayName || user.username}</span>
+            <button
+              type="button"
+              className="user-panel-toggle"
+              onClick={() => setShowHistoryPanel((prev) => !prev)}
+            >
+              {showHistoryPanel ? '기록 닫기' : '내 요청 기록'}
+            </button>
             {isManager && (
               <button
                 type="button"
@@ -200,6 +209,7 @@ function TemplateHeader() {
           onPendingUpdate={setPendingCount}
         />
       )}
+      {showHistoryPanel && <ChangeHistoryPanel dayLabels={DAY_LABELS} />}
       {showUserPanel && isSuperadmin && <UserManagementPanel />}
       {showPrintPreview && isManager && (
         <PrintPreviewModal

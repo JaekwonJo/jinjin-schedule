@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import './EditCellModal.css';
 
-function EditCellModal({ title, initialStudents = '', initialNotes = '', onSave, onDelete, onClose }) {
+function EditCellModal({ title, initialStudents = '', initialNotes = '', initialColor = '#333333', onSave, onDelete, onClose }) {
   const [students, setStudents] = useState(initialStudents);
   const [notes, setNotes] = useState(initialNotes);
+  const [color, setColor] = useState(initialColor || '#333333');
 
   const handleSubmit = (event) => {
     event.preventDefault();
     if (typeof onSave === 'function') {
-      onSave(students, notes);
+      onSave(students, notes, color);
     }
   };
 
@@ -34,6 +35,14 @@ function EditCellModal({ title, initialStudents = '', initialNotes = '', onSave,
             value={notes}
             onChange={(event) => setNotes(event.target.value)}
             placeholder="예: 교재, 특이사항 등"
+          />
+
+          <label htmlFor="modal-color">학생 이름 색상</label>
+          <input
+            id="modal-color"
+            type="color"
+            value={color}
+            onChange={(event) => setColor(event.target.value)}
           />
 
           <div className="modal-actions">

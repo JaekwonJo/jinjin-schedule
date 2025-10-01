@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { useTemplate } from '../context/TemplateContext';
 import { useAuth } from '../context/AuthContext';
 import { createChangeRequest } from '../api/changeRequests';
+import EditCellModal from './modals/EditCellModal';
 import './ScheduleGrid.css';
 
 function ScheduleGrid() {
@@ -18,6 +19,7 @@ function ScheduleGrid() {
   const { user } = useAuth();
 
   const [newTime, setNewTime] = useState('');
+  const [editingCell, setEditingCell] = useState(null);
 
   const sortedTimeSlots = useMemo(() => timeSlots, [timeSlots]);
 
@@ -51,23 +53,17 @@ function ScheduleGrid() {
     }
 
     const key = `${dayIndex}-${timeLabel}`;
-    const currentValue = scheduleMap[key] || { students: '', notes: '' };
+    const currentValue = scheduleMap[key] || { students: '', notes: '', color: '#333333' };
 
     if (isManager) {
-      const studentInput = window.prompt('학생 이름을 입력하세요 (쉼표로 구분 가능)', currentValue.students || '');
-      if (studentInput === null) return;
-      const notesInput = window.prompt('메모/비고를 입력하세요 (없으면 비워 두세요)', currentValue.notes || '');
-      if (notesInput === null) return;
-
-      if (!studentInput.trim() && !notesInput.trim()) {
-        // 둘 다 비워두면 해당 셀 초기화
-        setCell(dayIndex, timeLabel, undefined);
-        return;
-      }
-
-      setCell(dayIndex, timeLabel, {
-        students: studentInput,
-        notes: notesInput
+      setEditingCell({
+        dayIndex,
+        timeLabel,
+        initial: {
+          students: currentValue.students || '',
+          notes: currentValue.notes || '',
+          color: currentValue.color || '#333333'
+        }
       });
       return;
     }
@@ -83,6 +79,7 @@ function ScheduleGrid() {
       payload: {
         currentStudents: currentValue.students || '',
         currentNotes: currentValue.notes || '',
+        currentColor: currentValue.color || '#333333',
         message: message.trim()
       }
     })
@@ -105,6 +102,35 @@ function ScheduleGrid() {
 
   return (
     <div className="schedule-container">
+      {editingCell && (
+        <EditCellModal
+          title={`${DAY_LABELS[editingCell.dayIndex]}요일 · ${editingCell.timeLabel}`}
+          initialStudents={editingCell.initial.students}
+          initialNotes={editingCell.initial.notes}
+          initialColor={editingCell.initial.color}
+          onSave={(students, notes, color) => {
+            const trimmedStudents = students.trim();
+            const trimmedNotes = notes.trim();
+            const safeColor = color || '#333333';
+
+            if (!trimmedStudents && !trimmedNotes) {
+              setCell(editingCell.dayIndex, editingCell.timeLabel, undefined);
+            } else {
+              setCell(editingCell.dayIndex, editingCell.timeLabel, {
+                students: trimmedStudents,
+                notes: trimmedNotes,
+                color: safeColor
+              });
+            }
+            setEditingCell(null);
+          }}
+          onDelete={() => {
+            setCell(editingCell.dayIndex, editingCell.timeLabel, undefined);
+            setEditingCell(null);
+          }}
+          onClose={() => setEditingCell(null)}
+        />
+      )}
       <div className="schedule-header">
         <h2>📋 주간 시간표</h2>
         {isManager && (
@@ -154,6 +180,7 @@ function ScheduleGrid() {
               const cell = scheduleMap[key];
               const students = cell?.students;
               const notes = cell?.notes;
+              const color = cell?.color || '#333333';
 
               return (
                 <div
@@ -161,7 +188,7 @@ function ScheduleGrid() {
                   className={`schedule-cell ${(students || notes) ? 'filled' : 'empty'}`}
                   onClick={() => handleCellClick(dayIndex, timeLabel)}
                 >
-                  <span className="cell-students">
+                  <span className="cell-students" style={{ color }}>
                     {students?.trim()
                       ? students
                       : isManager

@@ -43,6 +43,7 @@ db.serialize(() => {
       teacher_name TEXT DEFAULT '',
       student_names TEXT DEFAULT '',
       notes TEXT DEFAULT '',
+      color TEXT DEFAULT '#333333',
       created_at TEXT DEFAULT (datetime('now')),
       updated_at TEXT DEFAULT (datetime('now')),
       FOREIGN KEY (template_id) REFERENCES templates(id) ON DELETE CASCADE
@@ -53,6 +54,12 @@ db.serialize(() => {
     CREATE UNIQUE INDEX IF NOT EXISTS idx_schedule_entry_unique
     ON schedule_entries (template_id, day_of_week, time_label, teacher_name)
   `);
+
+  db.run(`ALTER TABLE schedule_entries ADD COLUMN color TEXT DEFAULT '#333333'`, (err) => {
+    if (err && !String(err.message).includes('duplicate column name')) {
+      console.warn('schedule_entries.color 추가 실패', err.message);
+    }
+  });
 
   db.run(`
     CREATE TABLE IF NOT EXISTS change_requests (

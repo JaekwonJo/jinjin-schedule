@@ -1,0 +1,75 @@
+.history-panel {
+  margin-top: 16px;
+  padding: 18px;
+  border-radius: 14px;
+  background: #faf9ff;
+  box-shadow: 0 6px 18px rgba(120, 110, 200, 0.15);
+}
+
+.history-panel h3 {
+  margin-top: 0;
+  color: #3b3375;
+}
+
+.history-error {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #ffeef0;
+  color: #d93025;
+}
+
+.history-panel ul {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.history-item {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: white;
+  border: 1px solid rgba(150, 150, 220, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.history-item--approved {
+  border-left: 4px solid #30b871;
+}
+
+.history-item--rejected {
+  border-left: 4px solid #e05f5f;
+}
+
+.history-item--pending {
+  border-left: 4px solid #f2c14e;
+}
+
+.history-item header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: #433d79;
+}
+
+.history-item pre {
+  margin: 0;
+  background: #f5f4ff;
+  border-radius: 8px;
+  padding: 10px;
+  white-space: pre-wrap;
+  font-size: 0.85rem;
+  color: #36415d;
+}
+
+.history-item footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.8rem;
+  color: #6a648e;
+}
