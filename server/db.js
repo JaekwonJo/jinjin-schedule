@@ -66,9 +66,23 @@ db.serialize(() => {
       created_at TEXT DEFAULT (datetime('now')),
       decided_at TEXT,
       decided_by TEXT,
+      acknowledged_by TEXT,
+      acknowledged_at TEXT,
       FOREIGN KEY (template_id) REFERENCES templates(id) ON DELETE CASCADE
     )
   `);
+
+  db.run(`ALTER TABLE change_requests ADD COLUMN acknowledged_by TEXT`, (err) => {
+    if (err && !String(err.message).includes('duplicate column name')) {
+      console.warn('change_requests.acknowledged_by 추가 실패', err.message);
+    }
+  });
+
+  db.run(`ALTER TABLE change_requests ADD COLUMN acknowledged_at TEXT`, (err) => {
+    if (err && !String(err.message).includes('duplicate column name')) {
+      console.warn('change_requests.acknowledged_at 추가 실패', err.message);
+    }
+  });
 
   db.run(`
     CREATE TABLE IF NOT EXISTS users (

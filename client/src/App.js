@@ -5,6 +5,7 @@ import TemplateHeader from './components/TemplateHeader';
 import LoginPage from './pages/LoginPage';
 import { TemplateProvider, useTemplate } from './context/TemplateContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import ChangeNotifications from './components/ChangeNotifications';
 
 function HealthStatus() {
   const [statusText, setStatusText] = useState('연결 확인 중...');
@@ -41,6 +42,7 @@ function Dashboard() {
     <div className="dashboard">
       <TemplateHeader />
       <ErrorBanner />
+      <ChangeNotifications />
       {loading && <div className="loading">불러오는 중...</div>}
       <ScheduleGrid />
     </div>

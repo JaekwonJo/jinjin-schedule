@@ -1,0 +1,79 @@
+.change-toast {
+  margin-bottom: 16px;
+  padding: 16px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.18) 0%, rgba(118, 75, 162, 0.18) 100%);
+  border: 1px solid rgba(102, 126, 234, 0.25);
+  color: #2f2b5a;
+}
+
+.change-toast__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.change-toast__header button {
+  background: none;
+  border: none;
+  color: #4a3fa2;
+  cursor: pointer;
+}
+
+.change-toast ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.change-toast__item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.change-toast__item strong {
+  font-weight: 700;
+}
+
+.change-toast__item--approved strong {
+  color: #1b7f42;
+}
+
+.change-toast__item--rejected strong {
+  color: #c23c3c;
+}
+
+.change-toast__item span {
+  font-size: 0.9rem;
+  color: #47406e;
+}
+
+.change-toast__item em {
+  font-size: 0.8rem;
+  color: #6b648d;
+}
+
+.change-toast__item button {
+  align-self: flex-end;
+  margin-top: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: none;
+  background: #e7e4ff;
+  color: #534aa4;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.change-toast__item button:hover {
+  background: #d9d4ff;
+}

@@ -1,0 +1,93 @@
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(20, 20, 40, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal-card {
+  width: min(480px, 92vw);
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 18px 50px rgba(63, 74, 116, 0.25);
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-card header h2 {
+  margin: 0;
+  color: #2f3368;
+  font-size: 1.25rem;
+}
+
+.modal-subtitle {
+  margin: 6px 0 0;
+  color: #5c5a85;
+  font-size: 0.9rem;
+}
+
+.modal-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-card textarea {
+  min-height: 80px;
+  resize: vertical;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 2px solid #d6d4f4;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.modal-card textarea:focus {
+  outline: none;
+  border-color: #7c6cf6;
+  box-shadow: 0 0 0 4px rgba(124, 108, 246, 0.15);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.modal-actions button {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.modal-actions .primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.modal-actions .danger {
+  background: #ffe8e8;
+  color: #d64545;
+}
+
+.modal-actions button:not(.primary):not(.danger) {
+  background: #f0f1ff;
+  color: #575d90;
+}
+
+@media (max-width: 480px) {
+  .modal-card {
+    padding: 20px;
+  }
+}

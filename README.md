@@ -20,6 +20,8 @@
 - [ ] PDF/카카오톡 공유용 출력
 - [ ] 구글시트/CSV 데이터 일괄 가져오기 스크립트
 - [x] 관리자용 수정 요청 로그 & 승인 패널
+- [x] 셀 단위 학생/메모 모달 편집 + 선생님 요청 작성
+- [x] 승인 알림 토스트/배지 + 이메일 전송 스텁
 
 ## 🛠️ 기술 스택
 - **Frontend**: React 19 (`client/` 폴더, CRA 기반), 추후 react-beautiful-dnd 추가 예정
@@ -37,6 +39,13 @@ SUPERADMIN_PASSWORD=admin1234
 SUPERADMIN_DISPLAY_NAME=원장님
 PASSWORD_SALT_ROUNDS=10
 PORT=5001
+# (선택) 이메일 알림을 사용하려면 아래 SMTP 값을 채워주세요.
+SMTP_HOST=
+SMTP_PORT=
+SMTP_USER=
+SMTP_PASS=
+NOTIFY_FROM=
+NOTIFY_TO=
 ```
 
 React 개발 서버가 API를 찾을 수 있도록 `client/.env` 파일도 만들어 주세요.
@@ -44,6 +53,22 @@ React 개발 서버가 API를 찾을 수 있도록 `client/.env` 파일도 만�
 ```
 REACT_APP_API_BASE=http://localhost:5001
 ```
+
+### 📧 네이버 메일 SMTP 설정 방법 (선택)
+1. 네이버 메일 → 환경설정 → **POP3/IMAP**에서 IMAP/SMTP 사용을 “사용함”으로 변경합니다.
+2. 같은 화면에서 2단계 인증을 켠 뒤, **애플리케이션 비밀번호 생성**으로 이동합니다.
+   - 종류 선택을 `직접 입력`으로 두고 예: `jinjin-schedule`을 입력 후 생성하기를 누릅니다.
+   - 12자리 대문자/숫자 비밀번호가 표시되며, 이 값이 `.env`의 `SMTP_PASS`가 됩니다.
+3. `.env`를 아래 예시처럼 채웁니다.
+   ```
+   SMTP_HOST=smtp.naver.com
+   SMTP_PORT=465
+   SMTP_USER=네이버아이디@naver.com
+   SMTP_PASS=위에서 생성한 12자리 비밀번호
+   NOTIFY_FROM=네이버아이디@naver.com
+   NOTIFY_TO=알림을 받을 주소 (여러 개면 콤마로 구분)
+   ```
+4. 서버를 재시작하면 `server/services/notifier.js`가 승인/거절 시 자동으로 이메일을 전송합니다. (환경 변수를 비워두면 콘솔 로그만 남아요.)
 
 ## 🚀 실행 방법
 ```bash

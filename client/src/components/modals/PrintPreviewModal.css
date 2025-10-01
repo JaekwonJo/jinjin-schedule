@@ -1,0 +1,118 @@
+.print-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 24, 48, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.print-modal-card {
+  width: min(1200px, 94vw);
+  max-height: 90vh;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 18px 40px rgba(72, 85, 120, 0.25);
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  overflow: hidden;
+}
+
+.print-modal-card header h2 {
+  margin: 0;
+  color: #2f3368;
+}
+
+.print-meta {
+  margin: 10px 0 0;
+  color: #5c5a85;
+}
+
+.print-table-wrapper {
+  overflow: auto;
+  border: 1px solid #e4e6f2;
+  border-radius: 12px;
+}
+
+.print-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.print-table th,
+.print-table td {
+  border: 1px solid #dcdff5;
+  padding: 10px;
+  vertical-align: top;
+  min-width: 120px;
+}
+
+.print-table thead {
+  background: #f0f2ff;
+  color: #2f3368;
+}
+
+.print-table .time-cell {
+  font-weight: 700;
+  text-align: center;
+  background: #f9f9ff;
+}
+
+.print-table .students {
+  white-space: pre-wrap;
+}
+
+.print-table .notes {
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: #374667;
+}
+
+.print-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.print-actions button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.print-actions button:first-of-type {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.print-actions button:last-of-type {
+  background: #f0f1ff;
+  color: #575d90;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-table,
+  .print-table * {
+    visibility: visible;
+  }
+  .print-modal-card {
+    position: absolute;
+    inset: 10px;
+    box-shadow: none;
+    width: calc(100vw - 20px);
+    max-height: none;
+  }
+  .print-actions,
+  .print-modal-backdrop {
+    display: none;
+  }
+}

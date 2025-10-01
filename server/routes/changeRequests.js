@@ -3,6 +3,7 @@ const router = express.Router();
 
 const { run, all, get } = require('../db');
 const { requireRole } = require('../middleware/auth');
+const { sendDecisionNotification, isEmailConfigured } = require('../services/notifier');
 
 const mapRow = (row) => ({
   id: row.id,
@@ -14,7 +15,9 @@ const mapRow = (row) => ({
   status: row.status,
   createdAt: row.created_at,
   decidedAt: row.decided_at,
-  decidedBy: row.decided_by
+  decidedBy: row.decided_by,
+  acknowledgedBy: row.acknowledged_by,
+  acknowledgedAt: row.acknowledged_at
 });
 
 router.get('/', async (req, res) => {
@@ -87,10 +90,65 @@ router.patch('/:id/decision', requireRole('manager', 'superadmin'), async (req, 
     );
 
     const updated = await get('SELECT * FROM change_requests WHERE id = ?', [id]);
+
+    if (isEmailConfigured()) {
+      try {
+        const template = await get('SELECT name FROM templates WHERE id = ?', [updated.template_id]);
+        const templateName = template?.name || `템플릿 #${updated.template_id}`;
+        const dayLabel = ['월', '화', '수', '목', '금', '토', '일'][updated.day_of_week] || `${updated.day_of_week}일차`;
+        await sendDecisionNotification({
+          templateName,
+          dayLabel,
+          timeLabel: updated.time_label,
+          status,
+          requestedBy: updated.requested_by,
+          decidedBy: updated.decided_by || decidedBy || '관리자'
+        });
+      } catch (notifyError) {
+        console.warn('알림 이메일 전송 실패', notifyError);
+      }
+    }
+
     res.json({ request: mapRow(updated) });
   } catch (error) {
     console.error('Failed to update request status', error);
     res.status(500).json({ error: '요청 상태를 변경하지 못했어요.' });
+  }
+});
+
+router.patch('/:id/acknowledge', async (req, res) => {
+  const { id } = req.params;
+  const { user } = req;
+
+  if (!user) {
+    return res.status(401).json({ error: '로그인이 필요합니다.' });
+  }
+
+  try {
+    const request = await get('SELECT * FROM change_requests WHERE id = ?', [id]);
+
+    if (!request) {
+      return res.status(404).json({ error: '요청을 찾지 못했어요.' });
+    }
+
+    if (user.role === 'teacher') {
+      const displayName = user.displayName || user.username;
+      if ((request.requested_by || '').trim() !== displayName.trim()) {
+        return res.status(403).json({ error: '본인 요청만 읽음 처리할 수 있어요.' });
+      }
+    }
+
+    const now = new Date().toISOString();
+    await run(
+      `UPDATE change_requests SET acknowledged_by = ?, acknowledged_at = ? WHERE id = ?`,
+      [user.displayName || user.username || '사용자', now, id]
+    );
+
+    const updated = await get('SELECT * FROM change_requests WHERE id = ?', [id]);
+    res.json({ request: mapRow(updated) });
+  } catch (error) {
+    console.error('읽음 처리 실패', error);
+    res.status(500).json({ error: '읽음 처리를 완료하지 못했어요.' });
   }
 });
 

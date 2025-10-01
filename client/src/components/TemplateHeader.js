@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { fetchChangeRequests } from '../api/changeRequests';
 import UserManagementPanel from './UserManagementPanel';
 import ChangeRequestPanel from './ChangeRequestPanel';
+import PrintPreviewModal from './modals/PrintPreviewModal';
 import './TemplateHeader.css';
 
 function TemplateHeader() {
@@ -16,7 +17,10 @@ function TemplateHeader() {
     saveSchedule,
     saving,
     loading,
-    refreshTemplates
+    refreshTemplates,
+    scheduleMap,
+    timeSlots,
+    DAY_LABELS
   } = useTemplate();
   const { user, logout } = useAuth();
 
@@ -26,6 +30,7 @@ function TemplateHeader() {
   const [showRequestPanel, setShowRequestPanel] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
   const [requestLoading, setRequestLoading] = useState(false);
+  const [showPrintPreview, setShowPrintPreview] = useState(false);
 
   useEffect(() => {
     const current = templates.find((template) => template.id === selectedTemplateId);
@@ -148,6 +153,15 @@ function TemplateHeader() {
               <button
                 type="button"
                 className="user-panel-toggle"
+                onClick={() => setShowPrintPreview(true)}
+              >
+                인쇄 미리보기
+              </button>
+            )}
+            {isManager && (
+              <button
+                type="button"
+                className="user-panel-toggle"
                 onClick={() => setShowRequestPanel((prev) => !prev)}
               >
                 {showRequestPanel ? '요청 관리 닫기' : '요청 관리 열기'}
@@ -187,6 +201,15 @@ function TemplateHeader() {
         />
       )}
       {showUserPanel && isSuperadmin && <UserManagementPanel />}
+      {showPrintPreview && isManager && (
+        <PrintPreviewModal
+          templateName={templates.find((t) => t.id === selectedTemplateId)?.name || '무제 시간표'}
+          dayLabels={DAY_LABELS}
+          timeSlots={timeSlots}
+          scheduleMap={scheduleMap}
+          onClose={() => setShowPrintPreview(false)}
+        />
+      )}
     </div>
   );
 }
