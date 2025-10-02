@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { fetchChangeRequests } from '../api/changeRequests';
 import './ChangeHistoryPanel.css';
@@ -13,6 +13,25 @@ function ChangeHistoryPanel({ dayLabels, templates }) {
   const [keyword, setKeyword] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+
+  const FILTER_STORAGE_KEY = 'jinjin-history-filters-v1';
+  const deferredKeyword = useDeferredValue(keyword);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    try {
+      const stored = window.localStorage.getItem(FILTER_STORAGE_KEY);
+      if (!stored) return;
+      const parsed = JSON.parse(stored);
+      if (parsed.statusFilter) setStatusFilter(parsed.statusFilter);
+      if (parsed.templateFilter) setTemplateFilter(parsed.templateFilter);
+      if (parsed.keyword) setKeyword(parsed.keyword);
+      if (parsed.dateFrom) setDateFrom(parsed.dateFrom);
+      if (parsed.dateTo) setDateTo(parsed.dateTo);
+    } catch (storageError) {
+      console.warn('필터 복원 실패', storageError);
+    }
+  }, []);
 
   useEffect(() => {
     const load = async () => {
@@ -41,10 +60,27 @@ function ChangeHistoryPanel({ dayLabels, templates }) {
     load();
   }, [user]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const snapshot = {
+      statusFilter,
+      templateFilter,
+      keyword,
+      dateFrom,
+      dateTo
+    };
+    try {
+      window.localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(snapshot));
+    } catch (storageError) {
+      console.warn('필터 저장 실패', storageError);
+    }
+  }, [statusFilter, templateFilter, keyword, dateFrom, dateTo]);
+
   const filteredItems = useMemo(() => {
     const start = dateFrom ? new Date(dateFrom).getTime() : null;
     const end = dateTo ? new Date(dateTo).getTime() : null;
-    const lower = keyword.trim().toLowerCase();
+    const lower = deferredKeyword.trim().toLowerCase();
 
     return items.filter((item) => {
       if (statusFilter !== 'all' && item.status !== statusFilter) return false;
@@ -59,7 +95,28 @@ function ChangeHistoryPanel({ dayLabels, templates }) {
       }
       return true;
     });
-  }, [items, statusFilter, templateFilter, keyword, dateFrom, dateTo]);
+  }, [items, statusFilter, templateFilter, deferredKeyword, dateFrom, dateTo]);
+
+  const stats = useMemo(() => {
+    return items.reduce(
+      (acc, item) => {
+        acc.total += 1;
+        if (item.status === 'pending') acc.pending += 1;
+        if (item.status === 'approved') acc.approved += 1;
+        if (item.status === 'rejected') acc.rejected += 1;
+        return acc;
+      },
+      { total: 0, pending: 0, approved: 0, rejected: 0 }
+    );
+  }, [items]);
+
+  const handleReset = () => {
+    setStatusFilter('all');
+    setTemplateFilter('all');
+    setKeyword('');
+    setDateFrom('');
+    setDateTo('');
+  };
 
   if (!user) return null;
 
@@ -95,6 +152,16 @@ function ChangeHistoryPanel({ dayLabels, templates }) {
           value={keyword}
           onChange={(event) => setKeyword(event.target.value)}
         />
+        <button type="button" className="history-filter-reset" onClick={handleReset}>
+          필터 초기화
+        </button>
+      </div>
+      <div className="history-stats">
+        <span className="history-chip">전체 {stats.total}</span>
+        <span className="history-chip history-chip--pending">대기 {stats.pending}</span>
+        <span className="history-chip history-chip--approved">승인 {stats.approved}</span>
+        <span className="history-chip history-chip--rejected">거절 {stats.rejected}</span>
+        <span className="history-chip history-chip--result">필터 결과 {filteredItems.length}</span>
       </div>
       {error && <div className="history-error">{error}</div>}
       {loading ? (

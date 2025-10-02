@@ -27,6 +27,57 @@
   font-size: 0.9rem;
 }
 
+.history-filter-reset {
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: 1px solid #d3cdfb;
+  background: #f2f0ff;
+  color: #4a3f99;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.history-filter-reset:hover {
+  background: #e4e0ff;
+}
+
+.history-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.history-chip {
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: #f0efff;
+  color: #443b84;
+}
+
+.history-chip--pending {
+  background: rgba(242, 193, 78, 0.18);
+  color: #b68417;
+}
+
+.history-chip--approved {
+  background: rgba(71, 201, 136, 0.18);
+  color: #1d8b58;
+}
+
+.history-chip--rejected {
+  background: rgba(224, 95, 95, 0.18);
+  color: #c74343;
+}
+
+.history-chip--result {
+  background: #e7e4ff;
+  color: #3c2fa5;
+}
+
 .history-error {
   padding: 10px 12px;
   border-radius: 10px;

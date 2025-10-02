@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTemplate } from '../context/TemplateContext';
 import { useAuth } from '../context/AuthContext';
 import { fetchChangeRequests } from '../api/changeRequests';
+import { sendTestNotification } from '../api/notifications';
 import UserManagementPanel from './UserManagementPanel';
 import ChangeRequestPanel from './ChangeRequestPanel';
 import ChangeHistoryPanel from './ChangeHistoryPanel';
@@ -34,6 +35,7 @@ function TemplateHeader() {
   const [requestLoading, setRequestLoading] = useState(false);
   const [showPrintPreview, setShowPrintPreview] = useState(false);
   const [testingMail, setTestingMail] = useState(false);
+  const [testFeedback, setTestFeedback] = useState(null);
 
   useEffect(() => {
     const current = templates.find((template) => template.id === selectedTemplateId);
@@ -62,6 +64,12 @@ function TemplateHeader() {
 
     loadPendingCount();
   }, [isManager, showRequestPanel]);
+
+  useEffect(() => {
+    if (!testFeedback) return undefined;
+    const timer = setTimeout(() => setTestFeedback(null), 6000);
+    return () => clearTimeout(timer);
+  }, [testFeedback]);
 
   const handleCreate = async () => {
     if (!isManager) {
@@ -181,6 +189,11 @@ function TemplateHeader() {
                 {requestLoading && !showRequestPanel && <span className="badge badge--loading">…</span>}
               </button>
             )}
+            {testFeedback && (
+              <div className={`mail-test-alert mail-test-alert--${testFeedback.type}`}>
+                {testFeedback.message}
+              </div>
+            )}
             {isSuperadmin && (
               <button
                 type="button"
@@ -189,10 +202,16 @@ function TemplateHeader() {
                   try {
                     setTestingMail(true);
                     const response = await sendTestNotification();
-                    window.alert(response.message || '테스트 메일을 보냈어요!');
+                    setTestFeedback({
+                      type: 'success',
+                      message: response.message || '테스트 메일을 보냈어요! 우편함을 확인해 주세요.'
+                    });
                   } catch (error) {
                     console.error(error);
-                    window.alert(error.message || '테스트 메일을 보내지 못했어요. SMTP 설정을 확인해주세요.');
+                    setTestFeedback({
+                      type: 'error',
+                      message: error.message || '테스트 메일을 보내지 못했어요. SMTP 설정을 확인해 주세요.'
+                    });
                   } finally {
                     setTestingMail(false);
                   }

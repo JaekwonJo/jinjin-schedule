@@ -110,6 +110,29 @@
   gap: 6px;
 }
 
+.mail-test-alert {
+  font-size: 0.78rem;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #f5f4ff;
+  color: #4a4874;
+  text-align: right;
+  max-width: 260px;
+  line-height: 1.4;
+}
+
+.mail-test-alert--success {
+  background: #eefdf3;
+  color: #1e8d56;
+  border: 1px solid rgba(30, 141, 86, 0.25);
+}
+
+.mail-test-alert--error {
+  background: #fff2f1;
+  color: #c63b3b;
+  border: 1px solid rgba(198, 59, 59, 0.25);
+}
+
 .role-chip {
   display: inline-block;
   padding: 4px 10px;

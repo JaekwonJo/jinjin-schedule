@@ -159,5 +159,5 @@
 - 오류: 인쇄 미리보기에서 색상 전설이 흐트러짐 → 원인: 리스트 레이아웃이 고정 폭이 아님 → 해결: CSS로 컬럼 정렬·간격을 재정비 → 수정파일: `client/src/components/modals/PrintPreviewModal.css`
 - 오류: 셀 편집 시 학생/비고/색상을 따로 저장해야 했음 → 원인: 모달 폼이 분리 → 해결: 단일 폼으로 통합하고 Context 저장 로직을 정리 → 수정파일: `client/src/components/modals/EditCellModal.js`, `client/src/context/TemplateContext.js`
 - 오류: 승인/거절 후 선생님 화면에 알림 표시가 늦음 → 원인: 토스트/배지 상태 공유 미흡 → 해결: `ChangeNotifications`에서 읽음 처리와 배지 카운터를 동기화 → 수정파일: `client/src/components/ChangeNotifications.js`, `client/src/context/NotificationContext.js`
-- 오류: SMTP 설정을 확인할 수단이 없었음 → 원인: 테스트 엔드포인트 부재 → 해결: `POST /api/notifications/test` 추가 후 헤더 버튼과 연결 → 수정파일: `server/routes/notifications.js`, `client/src/api/notifications.js`, `client/src/components/TemplateHeader.js`
-- 오류: 요청 히스토리에서 원하는 기록을 찾기 어려움 → 원인: 필터 UI 미흡 → 해결: 상태·템플릿·기간 필터와 검색창을 추가 → 수정파일: `client/src/components/ChangeHistoryPanel.js`, `client/src/components/TemplateHeader.css`
+- 오류: SMTP 설정을 확인할 수단이 없었음 → 원인: 테스트 엔드포인트 부재 → 해결: `POST /api/notifications/test` 추가 후 헤더 버튼과 성공/실패 안내 배너를 연결 → 수정파일: `server/routes/notifications.js`, `client/src/api/notifications.js`, `client/src/components/TemplateHeader.js`
+- 오류: 요청 히스토리에서 원하는 기록을 찾기 어려움 → 원인: 필터 UI 미흡 → 해결: 상태·템플릿·기간 필터와 검색창을 추가하고 최근 값을 저장 → 수정파일: `client/src/components/ChangeHistoryPanel.js`, `client/src/components/ChangeHistoryPanel.css`, `client/src/components/TemplateHeader.css`
