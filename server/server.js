@@ -7,6 +7,7 @@ require('./db');
 
 const templateRoutes = require('./routes/templates');
 const changeRequestRoutes = require('./routes/changeRequests');
+const notificationsRoutes = require('./routes/notifications');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const { authenticate } = require('./middleware/auth');
@@ -23,6 +24,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/api/auth', authRoutes);
 app.use('/api/templates', authenticate, templateRoutes);
 app.use('/api/change-requests', authenticate, changeRequestRoutes);
+app.use('/api/notifications', notificationsRoutes);
 app.use('/api/users', userRoutes);
 
 app.get('/api/me', authenticate, (req, res) => {

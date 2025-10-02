@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import './PrintPreviewModal.css';
 
 function PrintPreviewModal({
@@ -21,6 +21,29 @@ function PrintPreviewModal({
     };
   };
 
+  const colorLegend = useMemo(() => {
+    const map = new Map();
+    timeSlots.forEach((timeLabel) => {
+      dayLabels.forEach((_, dayIndex) => {
+        const { students, color } = getCellContent(dayIndex, timeLabel);
+        if (students && color) {
+          const names = students.split(',').map((s) => s.trim()).filter(Boolean);
+          if (names.length === 0) return;
+          if (!map.has(color)) {
+            map.set(color, new Set(names));
+          } else {
+            const set = map.get(color);
+            names.forEach((n) => set.add(n));
+          }
+        }
+      });
+    });
+    return Array.from(map.entries()).map(([color, nameSet]) => ({
+      color,
+      names: Array.from(nameSet).join(', ')
+    }));
+  }, [dayLabels, timeSlots, scheduleMap]);
+
   return (
     <div className="print-modal-backdrop">
       <div className="print-modal-card">
@@ -31,6 +54,7 @@ function PrintPreviewModal({
             생성 시각: {now}
           </p>
           <img src="/logo-jinjin.png" alt="진진영어 학원 로고" className="print-logo" />
+          <p className="print-tip">💡 색상은 학생별 강조 색상을 의미해요. 일요일 열은 빨간색으로 강조됩니다.</p>
         </header>
 
         <div className="print-table-wrapper">
@@ -65,6 +89,20 @@ function PrintPreviewModal({
             </tbody>
           </table>
         </div>
+
+        {colorLegend.length > 0 && (
+          <div className="print-legend">
+            <h4>색상 전설</h4>
+            <ul>
+              {colorLegend.map(({ color, names }) => (
+                <li key={color}>
+                  <span className="legend-color" style={{ background: color }} />
+                  <span>{names}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <div className="print-actions">
           <button type="button" onClick={() => window.print()}>PDF/인쇄</button>

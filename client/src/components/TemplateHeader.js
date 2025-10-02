@@ -33,6 +33,7 @@ function TemplateHeader() {
   const [pendingCount, setPendingCount] = useState(0);
   const [requestLoading, setRequestLoading] = useState(false);
   const [showPrintPreview, setShowPrintPreview] = useState(false);
+  const [testingMail, setTestingMail] = useState(false);
 
   useEffect(() => {
     const current = templates.find((template) => template.id === selectedTemplateId);
@@ -184,6 +185,26 @@ function TemplateHeader() {
               <button
                 type="button"
                 className="user-panel-toggle"
+                onClick={async () => {
+                  try {
+                    setTestingMail(true);
+                    const response = await sendTestNotification();
+                    window.alert(response.message || '테스트 메일을 보냈어요!');
+                  } catch (error) {
+                    console.error(error);
+                    window.alert(error.message || '테스트 메일을 보내지 못했어요. SMTP 설정을 확인해주세요.');
+                  } finally {
+                    setTestingMail(false);
+                  }
+                }}
+              >
+                {testingMail ? '메일 전송 중...' : '테스트 메일 보내기'}
+              </button>
+            )}
+            {isSuperadmin && (
+              <button
+                type="button"
+                className="user-panel-toggle"
                 onClick={() => setShowUserPanel((prev) => !prev)}
               >
                 {showUserPanel ? '계정 관리 닫기' : '계정 관리 열기'}
@@ -209,7 +230,7 @@ function TemplateHeader() {
           onPendingUpdate={setPendingCount}
         />
       )}
-      {showHistoryPanel && <ChangeHistoryPanel dayLabels={DAY_LABELS} />}
+      {showHistoryPanel && <ChangeHistoryPanel dayLabels={DAY_LABELS} templates={templates} />}
       {showUserPanel && isSuperadmin && <UserManagementPanel />}
       {showPrintPreview && isManager && (
         <PrintPreviewModal

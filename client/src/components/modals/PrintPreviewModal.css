@@ -130,3 +130,51 @@
     display: none;
   }
 }
+.print-tip {
+  margin: 8px 0 0;
+  font-size: 0.9rem;
+  color: #5d5a8c;
+}
+
+.print-table tbody td:nth-child(8) {
+  background: #ffecec;
+}
+
+.print-legend {
+  margin: 12px 0 0;
+}
+
+.print-legend h4 {
+  margin: 0 0 8px;
+  color: #3a3672;
+}
+
+.print-legend ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.print-legend li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #4a4874;
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+@media print {
+  .print-legend {
+    page-break-inside: avoid;
+  }
+}
