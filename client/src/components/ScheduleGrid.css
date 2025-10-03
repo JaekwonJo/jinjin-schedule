@@ -22,11 +22,22 @@
   margin-bottom: 20px;
   padding-bottom: 15px;
   border-bottom: 2px solid #e0e0e0;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .schedule-header h2 {
   margin: 0;
   color: #333;
+}
+
+.schedule-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #6a5fb2;
+  background: #f3f1ff;
+  padding: 6px 12px;
+  border-radius: 999px;
 }
 
 .time-slot-controls {
@@ -138,9 +149,25 @@
   font-weight: 600;
 }
 
+.schedule-cell.hidden-for-teacher {
+  background: #f5f5f8;
+  border: 2px dashed rgba(120, 120, 160, 0.3);
+  color: #9a98b3;
+  font-weight: 500;
+}
+
 .cell-students {
   text-align: center;
   white-space: pre-wrap;
+}
+
+.cell-teacher {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #2f3368;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 4px 10px;
+  border-radius: 999px;
 }
 
 .cell-notes {
@@ -149,6 +176,11 @@
   background: rgba(255, 255, 255, 0.6);
   padding: 4px 8px;
   border-radius: 999px;
+}
+
+.cell-placeholder {
+  font-size: 0.85rem;
+  text-align: center;
 }
 
 .schedule-cell:hover {

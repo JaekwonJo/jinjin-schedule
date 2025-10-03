@@ -40,6 +40,19 @@
   gap: 12px;
 }
 
+.modal-card input[type="text"] {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 2px solid #d6d4f4;
+  font-size: 0.95rem;
+}
+
+.modal-card input[type="text"]:focus {
+  outline: none;
+  border-color: #7c6cf6;
+  box-shadow: 0 0 0 4px rgba(124, 108, 246, 0.15);
+}
+
 .modal-card textarea {
   min-height: 80px;
   resize: vertical;

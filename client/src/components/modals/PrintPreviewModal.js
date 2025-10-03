@@ -15,6 +15,7 @@ function PrintPreviewModal({
     const cell = scheduleMap[key];
     if (!cell) return { students: '', notes: '', color: '#333333' };
     return {
+      teacher: cell.teacher || '',
       students: cell.students || '',
       notes: cell.notes || '',
       color: cell.color || '#333333'
@@ -72,9 +73,12 @@ function PrintPreviewModal({
                 <tr key={timeLabel}>
                   <td className="time-cell">{timeLabel}</td>
                   {dayLabels.map((_, dayIndex) => {
-                    const { students, notes, color } = getCellContent(dayIndex, timeLabel);
+                    const { teacher, students, notes, color } = getCellContent(dayIndex, timeLabel);
                     return (
                       <td key={`${dayIndex}-${timeLabel}`}>
+                        {teacher && (
+                          <div className="teacher">👩‍🏫 {teacher}</div>
+                        )}
                         {students && (
                           <div className="students" style={{ color }}>{students}</div>
                         )}

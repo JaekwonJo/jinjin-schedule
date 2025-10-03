@@ -1,7 +1,17 @@
 import React, { useState } from 'react';
 import './EditCellModal.css';
 
-function EditCellModal({ title, initialStudents = '', initialNotes = '', initialColor = '#333333', onSave, onDelete, onClose }) {
+function EditCellModal({
+  title,
+  initialTeacher = '',
+  initialStudents = '',
+  initialNotes = '',
+  initialColor = '#333333',
+  onSave,
+  onDelete,
+  onClose
+}) {
+  const [teacher, setTeacher] = useState(initialTeacher);
   const [students, setStudents] = useState(initialStudents);
   const [notes, setNotes] = useState(initialNotes);
   const [color, setColor] = useState(initialColor || '#333333');
@@ -9,7 +19,7 @@ function EditCellModal({ title, initialStudents = '', initialNotes = '', initial
   const handleSubmit = (event) => {
     event.preventDefault();
     if (typeof onSave === 'function') {
-      onSave(students, notes, color);
+      onSave(students, notes, color, teacher);
     }
   };
 
@@ -21,6 +31,15 @@ function EditCellModal({ title, initialStudents = '', initialNotes = '', initial
           <p className="modal-subtitle">콤마로 학생을 구분하고, 메모에는 교재·특이사항 등을 적어주세요.</p>
         </header>
         <form onSubmit={handleSubmit}>
+          <label htmlFor="modal-teacher">담당 선생님</label>
+          <input
+            id="modal-teacher"
+            type="text"
+            value={teacher}
+            onChange={(event) => setTeacher(event.target.value)}
+            placeholder="예: 현T"
+          />
+
           <label htmlFor="modal-students">학생 이름 (쉼표로 구분)</label>
           <textarea
             id="modal-students"

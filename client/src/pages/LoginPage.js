@@ -49,7 +49,7 @@ function LoginPage() {
       <div className="login-card">
         <div className="login-header">
           <h1>진진영어학원</h1>
-          <p>400명의 시간을 지켜주는 우리만의 시간표 💙</p>
+          <p>진진을 지켜주는 우리만의 시간표 💙</p>
         </div>
 
         <form className="login-form" onSubmit={handleSubmit}>
@@ -59,7 +59,7 @@ function LoginPage() {
             type="text"
             value={username}
             onChange={(event) => setUsername(event.target.value)}
-            placeholder="예: hyunT"
+            placeholder="예: jinjinT"
             autoComplete="username"
             required
           />

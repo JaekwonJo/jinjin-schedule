@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react';
 import {
   fetchTemplates,
   createTemplate as apiCreateTemplate,
@@ -30,6 +30,8 @@ export function TemplateProvider({ children }) {
   const [selectedTemplateId, setSelectedTemplateId] = useState(null);
   const [scheduleMap, setScheduleMap] = useState({});
   const [timeSlots, setTimeSlots] = useState([...DEFAULT_TIME_SLOTS]);
+  const [viewMode, setViewMode] = useState('all'); // 'all' | 'teacher'
+  const [teacherFilter, setTeacherFilter] = useState('');
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
@@ -76,56 +78,74 @@ export function TemplateProvider({ children }) {
     refreshTemplates();
   }, [user]);
 
-  useEffect(() => {
-    if (!selectedTemplateId || !user) {
+  const loadEntriesForTemplate = useCallback(async (templateId) => {
+    const targetId = templateId ?? selectedTemplateId;
+
+    if (!targetId || !user) {
       setScheduleMap({});
       return;
     }
 
-    const loadEntries = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await fetchTemplateEntries(selectedTemplateId);
-        const entries = data.entries ?? [];
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchTemplateEntries(targetId);
+      const entries = data.entries ?? [];
 
-        const newMap = {};
-        const slots = new Set(DEFAULT_TIME_SLOTS);
+      const newMap = {};
+      const slots = new Set(DEFAULT_TIME_SLOTS);
 
-        entries.forEach((entry) => {
-          const key = buildKey(entry.dayOfWeek, entry.timeLabel);
-          newMap[key] = {
-            students: entry.studentNames || '',
-            notes: entry.notes || '',
-            color: entry.color || DEFAULT_COLOR
-          };
-          slots.add(entry.timeLabel);
-        });
+      entries.forEach((entry) => {
+        const key = buildKey(entry.dayOfWeek, entry.timeLabel);
+        newMap[key] = {
+          teacher: entry.teacherName || '',
+          students: entry.studentNames || '',
+          notes: entry.notes || '',
+          color: entry.color || DEFAULT_COLOR
+        };
+        slots.add(entry.timeLabel);
+      });
 
-        setScheduleMap(newMap);
-        setTimeSlots(Array.from(slots).sort((a, b) => parseTimeLabel(a) - parseTimeLabel(b)));
-      } catch (err) {
-        console.error(err);
-        setError(err.message);
-        setScheduleMap({});
-      } finally {
-        setLoading(false);
-      }
-    };
+      setScheduleMap(newMap);
+      setTimeSlots(Array.from(slots).sort((a, b) => parseTimeLabel(a) - parseTimeLabel(b)));
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+      setScheduleMap({});
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedTemplateId, user]);
 
-    loadEntries();
-  }, [selectedTemplateId]);
+  useEffect(() => {
+    loadEntriesForTemplate();
+  }, [loadEntriesForTemplate]);
 
   const setCell = (dayIndex, timeLabel, value) => {
     const key = buildKey(dayIndex, timeLabel);
     setScheduleMap((prev) => {
       const next = { ...prev };
-      const hasContent = value && (value.students?.trim?.() || value.notes?.trim?.());
-      if (hasContent) {
-        next[key] = value;
-      } else {
+      if (!value) {
         delete next[key];
+        return next;
       }
+
+      const teacher = value.teacher?.trim?.() || '';
+      const students = value.students?.trim?.() || '';
+      const notes = value.notes?.trim?.() || '';
+      const color = value.color || DEFAULT_COLOR;
+
+      if (!teacher && !students && !notes) {
+        delete next[key];
+        return next;
+      }
+
+      next[key] = {
+        teacher,
+        students,
+        notes,
+        color
+      };
       return next;
     });
   };
@@ -161,15 +181,16 @@ export function TemplateProvider({ children }) {
         DAY_LABELS.forEach((_, dayIndex) => {
           const key = buildKey(dayIndex, timeLabel);
           const cell = scheduleMap[key];
+          const teacherName = cell?.teacher?.trim?.() || '';
           const students = cell?.students?.trim?.() || '';
           const notes = cell?.notes?.trim?.() || '';
           const color = cell?.color || DEFAULT_COLOR;
 
-          if (students || notes) {
+          if (teacherName || students || notes) {
             entries.push({
               dayOfWeek: dayIndex,
               timeLabel,
-              teacherName: '',
+              teacherName,
               studentNames: students,
               notes,
               color
@@ -209,12 +230,47 @@ export function TemplateProvider({ children }) {
     setTemplates((prev) => prev.map((item) => (item.id === id ? template : item)));
   };
 
+  const teacherOptions = useMemo(() => {
+    const set = new Set();
+    Object.values(scheduleMap).forEach((cell) => {
+      const name = cell?.teacher?.trim?.();
+      if (name) {
+        set.add(name);
+      }
+    });
+    if (user?.displayName) set.add(user.displayName.trim());
+    else if (user?.username) set.add(user.username.trim());
+    return Array.from(set).sort((a, b) => a.localeCompare(b, 'ko'));
+  }, [scheduleMap, user]);
+
+  useEffect(() => {
+    if (viewMode === 'teacher') {
+      if (teacherFilter && teacherOptions.includes(teacherFilter)) {
+        return;
+      }
+      if (teacherOptions.length > 0) {
+        setTeacherFilter(teacherOptions[0]);
+      } else if (user?.displayName) {
+        setTeacherFilter(user.displayName.trim());
+      } else if (user?.username) {
+        setTeacherFilter(user.username.trim());
+      }
+    } else {
+      setTeacherFilter('');
+    }
+  }, [viewMode, teacherOptions, teacherFilter, user]);
+
   const value = useMemo(() => ({
     templates,
     selectedTemplateId,
     setSelectedTemplateId,
     scheduleMap,
     timeSlots,
+    viewMode,
+    setViewMode,
+    teacherFilter,
+    setTeacherFilter,
+    teacherOptions,
     loading,
     saving,
     error,
@@ -225,15 +281,20 @@ export function TemplateProvider({ children }) {
     createTemplate,
     renameTemplate,
     refreshTemplates,
+    loadEntriesForTemplate,
     DAY_LABELS
   }), [
     templates,
     selectedTemplateId,
     scheduleMap,
     timeSlots,
+    viewMode,
+    teacherFilter,
+    teacherOptions,
     loading,
     saving,
-    error
+    error,
+    loadEntriesForTemplate
   ]);
 
   return (

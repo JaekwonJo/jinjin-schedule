@@ -13,6 +13,7 @@
 .template-controls {
   display: flex;
   gap: 24px;
+  flex-wrap: wrap;
 }
 
 .template-select,
@@ -21,6 +22,70 @@
   flex-direction: column;
   gap: 8px;
   min-width: 220px;
+}
+
+.view-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 240px;
+}
+
+.view-mode label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #555;
+}
+
+.view-toggle {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.view-button {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid #d6ccff;
+  background: #f6f4ff;
+  color: #5a52b8;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.view-button.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: transparent;
+}
+
+.teacher-filter {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.teacher-filter select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 2px solid #dcd9ff;
+  background: #f7f6ff;
+  font-size: 0.9rem;
+  min-width: 160px;
+}
+
+.assign-me {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  background: #ede9ff;
+  color: #5a52b8;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.assign-me:hover {
+  background: #dad2ff;
 }
 
 .template-select label,
@@ -77,6 +142,27 @@
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.import-button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  background: #eef0ff;
+  color: #4e47a8;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.import-button:hover:not(:disabled) {
+  background: #dfe3ff;
+  transform: translateY(-1px);
+}
+
+.import-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .template-actions .save-button:disabled {

@@ -161,3 +161,19 @@
 - 오류: 승인/거절 후 선생님 화면에 알림 표시가 늦음 → 원인: 토스트/배지 상태 공유 미흡 → 해결: `ChangeNotifications`에서 읽음 처리와 배지 카운터를 동기화 → 수정파일: `client/src/components/ChangeNotifications.js`, `client/src/context/NotificationContext.js`
 - 오류: SMTP 설정을 확인할 수단이 없었음 → 원인: 테스트 엔드포인트 부재 → 해결: `POST /api/notifications/test` 추가 후 헤더 버튼과 성공/실패 안내 배너를 연결 → 수정파일: `server/routes/notifications.js`, `client/src/api/notifications.js`, `client/src/components/TemplateHeader.js`
 - 오류: 요청 히스토리에서 원하는 기록을 찾기 어려움 → 원인: 필터 UI 미흡 → 해결: 상태·템플릿·기간 필터와 검색창을 추가하고 최근 값을 저장 → 수정파일: `client/src/components/ChangeHistoryPanel.js`, `client/src/components/ChangeHistoryPanel.css`, `client/src/components/TemplateHeader.css`
+
+## 2025-10-03 (Evening) - CSV & 색상 업그레이드 🌈
+
+- 개선: CSV 업로드 시 헤더가 틀리면 업로드 전에 막을 수 있도록 프론트/백엔드 이중 검증을 추가 → 수정파일: `client/src/components/modals/CsvImportModal.js`, `server/routes/templates.js`
+- 개선: 샘플 템플릿(`client/public/templates/sample-schedule-template.csv`)을 제공하고 안내 문구를 보강 → 수정파일: `client/src/components/modals/CsvImportModal.js`, `client/public/templates/sample-schedule-template.csv`
+- 개선: 학생별 색상 팔레트(주요 원색)와 시간대별 파스텔 배경색 설정 기능을 추가 → 수정파일: `client/src/context/TemplateContext.js`, `client/src/components/ScheduleGrid.js`, `client/src/components/ScheduleGrid.css`, `client/src/components/modals/EditCellModal.js`, `client/src/components/modals/EditCellModal.css`
+- 개선: 관리자용 알림 로그 패널을 추가해 승인/거절 내역을 한 번에 확인 → 수정파일: `client/src/components/DecisionLogPanel.js`, `client/src/components/DecisionLogPanel.css`, `client/src/components/TemplateHeader.js`
+- 개선: 인쇄 미리보기에서 학생 칩과 시간대 배경색을 반영해 출력물을 더 읽기 쉽게 조정 → 수정파일: `client/src/components/modals/PrintPreviewModal.js`, `client/src/components/modals/PrintPreviewModal.css`
+
+## 2025-10-04 (Night) - 셀 선택 UX 대폭 강화 ⚡
+
+- 개선: 셀 선택 모드에 Shift 범위 선택, Ctrl 추가/제거를 도입해 구글시트처럼 직관적인 범위 지정이 가능해짐 → 수정파일: `client/src/components/ScheduleGrid.js`, `client/src/components/ScheduleGrid.css`
+- 개선: 선택한 셀을 한 번에 색상 변경·복사·붙여넣기·위치 이동할 수 있는 툴바/단축키를 추가 → 수정파일: `client/src/components/ScheduleGrid.js`, `client/src/components/ScheduleGrid.css`
+- 개선: 붙여넣기 범위와 이동 위치를 검증하고 충돌 시 경고를 띄워 데이터 손상을 방지 → 수정파일: `client/src/components/ScheduleGrid.js`
+- 개선: CSV 내보내기 및 `/validate-csv` API를 도입하고 TemplateHeader에서 바로 호출 가능하도록 UI를 추가 → 수정파일: `server/routes/templates.js`, `client/src/api/templates.js`, `client/src/components/TemplateHeader.js`
+- 개선: 샘플 CSV를 최신 포맷으로 갱신하고 docs에 업로드/검증 흐름을 문서화 → 수정파일: `client/public/templates/sample-schedule-template.csv`, `docs/data-import-plan.md`, `README.md`

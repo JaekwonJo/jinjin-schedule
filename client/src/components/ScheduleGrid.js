@@ -14,7 +14,9 @@ function ScheduleGrid() {
     scheduleMap,
     setCell,
     selectedTemplateId,
-    loading
+    loading,
+    viewMode,
+    teacherFilter
   } = useTemplate();
   const { user } = useAuth();
 
@@ -46,6 +48,9 @@ function ScheduleGrid() {
     }
   };
 
+  const activeTeacher = teacherFilter?.trim?.() || '';
+  const isTeacherMode = viewMode === 'teacher';
+
   const handleCellClick = (dayIndex, timeLabel) => {
     if (!selectedTemplateId) {
       window.alert('먼저 템플릿을 선택하거나 만들어 주세요.');
@@ -53,13 +58,14 @@ function ScheduleGrid() {
     }
 
     const key = `${dayIndex}-${timeLabel}`;
-    const currentValue = scheduleMap[key] || { students: '', notes: '', color: '#333333' };
+    const currentValue = scheduleMap[key] || { teacher: '', students: '', notes: '', color: '#333333' };
 
     if (isManager) {
       setEditingCell({
         dayIndex,
         timeLabel,
         initial: {
+          teacher: currentValue.teacher || '',
           students: currentValue.students || '',
           notes: currentValue.notes || '',
           color: currentValue.color || '#333333'
@@ -77,6 +83,7 @@ function ScheduleGrid() {
       timeLabel,
       requestedBy: displayName,
       payload: {
+        currentTeacher: currentValue.teacher || '',
         currentStudents: currentValue.students || '',
         currentNotes: currentValue.notes || '',
         currentColor: currentValue.color || '#333333',
@@ -105,18 +112,21 @@ function ScheduleGrid() {
       {editingCell && (
         <EditCellModal
           title={`${DAY_LABELS[editingCell.dayIndex]}요일 · ${editingCell.timeLabel}`}
+          initialTeacher={editingCell.initial.teacher}
           initialStudents={editingCell.initial.students}
           initialNotes={editingCell.initial.notes}
           initialColor={editingCell.initial.color}
-          onSave={(students, notes, color) => {
+          onSave={(students, notes, color, teacher) => {
             const trimmedStudents = students.trim();
             const trimmedNotes = notes.trim();
             const safeColor = color || '#333333';
+            const trimmedTeacher = (teacher || '').trim();
 
-            if (!trimmedStudents && !trimmedNotes) {
+            if (!trimmedTeacher && !trimmedStudents && !trimmedNotes) {
               setCell(editingCell.dayIndex, editingCell.timeLabel, undefined);
             } else {
               setCell(editingCell.dayIndex, editingCell.timeLabel, {
+                teacher: trimmedTeacher,
                 students: trimmedStudents,
                 notes: trimmedNotes,
                 color: safeColor
@@ -133,6 +143,9 @@ function ScheduleGrid() {
       )}
       <div className="schedule-header">
         <h2>📋 주간 시간표</h2>
+        {isTeacherMode && !activeTeacher && (
+          <p className="schedule-hint">선생님별 보기에서는 선생님 이름을 선택하면 해당 수업만 보여드려요.</p>
+        )}
         {isManager && (
           <div className="time-slot-controls">
             <input
@@ -178,24 +191,34 @@ function ScheduleGrid() {
             {DAY_LABELS.map((_, dayIndex) => {
               const key = `${dayIndex}-${timeLabel}`;
               const cell = scheduleMap[key];
+              const teacher = cell?.teacher?.trim?.() || '';
               const students = cell?.students;
               const notes = cell?.notes;
               const color = cell?.color || '#333333';
+              const matchesTeacher = viewMode === 'all' || !activeTeacher || teacher === activeTeacher;
+              const showPlaceholder = viewMode === 'teacher' && !matchesTeacher;
 
               return (
                 <div
                   key={key}
-                  className={`schedule-cell ${(students || notes) ? 'filled' : 'empty'}`}
+                  className={`schedule-cell ${(students || notes || teacher) ? 'filled' : 'empty'} ${showPlaceholder ? 'hidden-for-teacher' : ''}`}
                   onClick={() => handleCellClick(dayIndex, timeLabel)}
                 >
-                  <span className="cell-students" style={{ color }}>
-                    {students?.trim()
-                      ? students
-                      : isManager
-                        ? '+ 학생/메모 편집'
-                        : '수정 요청 보내기'}
-                  </span>
-                  {notes?.trim() && <span className="cell-notes">📝 {notes}</span>}
+                  {showPlaceholder ? (
+                    <span className="cell-placeholder">다른 선생님 수업</span>
+                  ) : (
+                    <>
+                      {teacher && <span className="cell-teacher">👩‍🏫 {teacher}</span>}
+                      <span className="cell-students" style={{ color }}>
+                        {students?.trim()
+                          ? students
+                          : isManager
+                            ? '+ 학생/메모 편집'
+                            : '수정 요청 보내기'}
+                      </span>
+                      {notes?.trim() && <span className="cell-notes">📝 {notes}</span>}
+                    </>
+                  )}
                 </div>
               );
             })}

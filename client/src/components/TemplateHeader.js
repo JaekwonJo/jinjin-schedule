@@ -7,6 +7,7 @@ import UserManagementPanel from './UserManagementPanel';
 import ChangeRequestPanel from './ChangeRequestPanel';
 import ChangeHistoryPanel from './ChangeHistoryPanel';
 import PrintPreviewModal from './modals/PrintPreviewModal';
+import CsvImportModal from './modals/CsvImportModal';
 import './TemplateHeader.css';
 
 function TemplateHeader() {
@@ -22,7 +23,13 @@ function TemplateHeader() {
     refreshTemplates,
     scheduleMap,
     timeSlots,
-    DAY_LABELS
+    DAY_LABELS,
+    viewMode,
+    setViewMode,
+    teacherFilter,
+    setTeacherFilter,
+    teacherOptions,
+    loadEntriesForTemplate
   } = useTemplate();
   const { user, logout } = useAuth();
 
@@ -36,6 +43,7 @@ function TemplateHeader() {
   const [showPrintPreview, setShowPrintPreview] = useState(false);
   const [testingMail, setTestingMail] = useState(false);
   const [testFeedback, setTestFeedback] = useState(null);
+  const [showImportModal, setShowImportModal] = useState(false);
 
   useEffect(() => {
     const current = templates.find((template) => template.id === selectedTemplateId);
@@ -113,6 +121,31 @@ function TemplateHeader() {
     }
   };
 
+  const handleViewMode = (mode) => {
+    setViewMode(mode);
+  };
+
+  const handleTeacherSelect = (event) => {
+    setTeacherFilter(event.target.value);
+  };
+
+  const setTeacherToMe = () => {
+    const candidate = user?.displayName?.trim?.() || user?.username?.trim?.();
+    if (candidate) {
+      setTeacherFilter(candidate);
+    } else {
+      window.alert('내 이름 정보를 찾을 수 없어요. 계정 정보를 확인해 주세요.');
+    }
+  };
+
+  const isTeacherMode = viewMode === 'teacher';
+
+  const handleImportSuccess = async () => {
+    await refreshTemplates();
+    await loadEntriesForTemplate(selectedTemplateId);
+    setShowImportModal(false);
+  };
+
   return (
     <div className="template-header">
       <div className="template-controls">
@@ -152,6 +185,39 @@ function TemplateHeader() {
             </button>
           </div>
           {renameError && <p className="error">{renameError}</p>}
+        </div>
+
+        <div className="view-mode">
+          <label>보기 모드</label>
+          <div className="view-toggle">
+            <button
+              type="button"
+              className={`view-button ${viewMode === 'all' ? 'active' : ''}`}
+              onClick={() => handleViewMode('all')}
+            >
+              전체 보기
+            </button>
+            <button
+              type="button"
+              className={`view-button ${isTeacherMode ? 'active' : ''}`}
+              onClick={() => handleViewMode('teacher')}
+            >
+              선생님별 보기
+            </button>
+          </div>
+          {isTeacherMode && (
+            <div className="teacher-filter">
+              <select value={teacherFilter || ''} onChange={handleTeacherSelect}>
+                {teacherOptions.length === 0 && <option value="">선생님 이름을 선택하세요</option>}
+                {teacherOptions.map((name) => (
+                  <option key={name} value={name}>{name}</option>
+                ))}
+              </select>
+              <button type="button" onClick={setTeacherToMe} className="assign-me">
+                내 이름으로 보기
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -231,6 +297,16 @@ function TemplateHeader() {
             )}
           </div>
         )}
+        {isManager && (
+          <button
+            type="button"
+            className="import-button"
+            onClick={() => setShowImportModal(true)}
+            disabled={!selectedTemplateId}
+          >
+            CSV 업로드
+          </button>
+        )}
         <button
           type="button"
           className="save-button"
@@ -258,6 +334,14 @@ function TemplateHeader() {
           timeSlots={timeSlots}
           scheduleMap={scheduleMap}
           onClose={() => setShowPrintPreview(false)}
+        />
+      )}
+      {showImportModal && isManager && selectedTemplateId && (
+        <CsvImportModal
+          templateId={selectedTemplateId}
+          templateName={templates.find((t) => t.id === selectedTemplateId)?.name || '무제 시간표'}
+          onClose={() => setShowImportModal(false)}
+          onImported={handleImportSuccess}
         />
       )}
     </div>

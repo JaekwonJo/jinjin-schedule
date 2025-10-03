@@ -1,4 +1,5 @@
 const API_BASE = process.env.REACT_APP_API_BASE || '';
+export { API_BASE };
 
 const defaultHeaders = {
   'Content-Type': 'application/json'

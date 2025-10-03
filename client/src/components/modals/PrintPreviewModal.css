@@ -75,6 +75,12 @@
   white-space: pre-wrap;
 }
 
+.print-table .teacher {
+  font-weight: 700;
+  color: #2f3368;
+  margin-bottom: 6px;
+}
+
 
 .print-table tbody td:last-child {
   background: #ffecec;
